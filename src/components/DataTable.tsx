@@ -1,5 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
-import * as XLSX from "xlsx";
+import ExcelJS from "exceljs";
+import { saveAs } from "file-saver";
 import type { TaskData } from "../lib/db";
 import { Filter, X, Download } from "lucide-react";
 
@@ -59,7 +60,7 @@ export function DataTable({ data }: DataTableProps) {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const handleExport = () => {
+  const handleExport = async () => {
     let toExport = data;
     
     // First, apply current table filters so it respects WITEL, Date, etc. if selected
@@ -88,26 +89,63 @@ export function DataTable({ data }: DataTableProps) {
 
     const exportCols = [...COLUMNS, { key: 'notes', label: 'CATATAN TEKNISI' }, { key: 'technicianName', label: 'NAMA TEKNISI' }];
     
-    const exportData = toExport.map(row => {
-      const obj: any = {};
-      exportCols.forEach(col => {
+    const workbook = new ExcelJS.Workbook();
+    const worksheet = workbook.addWorksheet('Data EBIS');
+
+    // Add Header Row
+    const headerRow = worksheet.addRow(exportCols.map(c => c.label));
+    
+    // Style the header row
+    headerRow.eachCell((cell) => {
+      cell.fill = {
+        type: 'pattern',
+        pattern: 'solid',
+        fgColor: { argb: 'FF1E40AF' } // Tailwind blue-800
+      };
+      cell.font = {
+        color: { argb: 'FFFFFFFF' },
+        bold: true
+      };
+      cell.alignment = { vertical: 'middle', horizontal: 'center' };
+      cell.border = {
+        top: { style: 'thin' },
+        left: { style: 'thin' },
+        bottom: { style: 'thin' },
+        right: { style: 'thin' }
+      };
+    });
+
+    // Add Data Rows
+    toExport.forEach(row => {
+      const rowData = exportCols.map(col => {
         let val = String((row as any)[col.key] || '');
         if (col.key === 'orderDate') {
           val = val.split(' ')[0];
         }
-        obj[col.label] = val;
+        return val;
       });
-      return obj;
+      
+      const dataRow = worksheet.addRow(rowData);
+      dataRow.eachCell(cell => {
+         cell.border = {
+          top: { style: 'thin' },
+          left: { style: 'thin' },
+          bottom: { style: 'thin' },
+          right: { style: 'thin' }
+         };
+         cell.alignment = { vertical: 'middle', wrapText: true };
+      });
     });
 
-    const worksheet = XLSX.utils.json_to_sheet(exportData);
-    const workbook = XLSX.utils.book_new();
-    XLSX.utils.book_append_sheet(workbook, worksheet, "Data EBIS");
-    
-    // Beri sedikit jarak agar rapi
-    worksheet['!cols'] = exportCols.map(() => ({ wch: 25 }));
+    // Adjust column widths
+    worksheet.columns.forEach(column => {
+      column.width = 28;
+    });
 
-    XLSX.writeFile(workbook, `export_${exportStatus === 'ALL' ? 'semua' : exportStatus}_${new Date().getTime()}.xlsx`);
+    // Download the file
+    const buffer = await workbook.xlsx.writeBuffer();
+    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+    saveAs(blob, `export_${exportStatus === 'ALL' ? 'semua' : exportStatus}_${new Date().getTime()}.xlsx`);
   };
 
   const filteredData = useMemo(() => {
