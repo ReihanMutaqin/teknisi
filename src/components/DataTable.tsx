@@ -34,8 +34,7 @@ const getFilterValue = (key: ColumnKey, rawVal: string) => {
   if (!rawVal) return '';
   const val = String(rawVal);
   if (key === 'orderDate') {
-    const parts = val.split(' ')[0].split('-');
-    return parts.length >= 2 ? `${parts[0]}-${parts[1]}` : val;
+    return val.split(' ')[0];
   }
   if (key === 'statusMessage') {
     // Aggressive truncation: split by common delimiters to get the core message
@@ -149,7 +148,7 @@ export function DataTable({ data }: DataTableProps) {
                         <div className="max-h-48 overflow-y-auto p-2 space-y-1">
                           {uniqueVals.map(val => {
                             const checked = filters[col.key]?.has(val);
-                            const displayVal = col.key === 'orderDate' ? formatMonth(val) : val;
+                            const displayVal = val;
                             return (
                               <label key={val} className="flex items-center gap-2 p-1 hover:bg-slate-50 rounded cursor-pointer">
                                 <input 
