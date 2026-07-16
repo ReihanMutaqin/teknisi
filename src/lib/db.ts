@@ -10,6 +10,8 @@ export interface TaskData {
   customerName: string;
   address: string;
   serviceType: string;
+  segmen?: string;
+  paket?: string;
   technicianName: string;
   trackerStatus: 'Pending' | 'On Progress' | 'Completed' | 'Kendala' | 'Cancel';
   notes: string;
@@ -44,6 +46,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           customerName: item['NAMA CUST'] || '',
           address: item['ALAMAT'] || '',
           serviceType: item['JENIS LAYANAN'] || '',
+          segmen: item['SEGMEN'] || '',
+          paket: item['PAKET'] || '',
           technicianName: '',
           trackerStatus: 'Pending',
           notes: '',
@@ -85,6 +89,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         customerName: item['NAMA CUST'] || '',
         address: item['ALAMAT'] || '',
         serviceType: item['JENIS LAYANAN'] || '',
+        segmen: item['SEGMEN'] || '',
+        paket: item['PAKET'] || '',
         technicianName: '', 
         trackerStatus: 'Pending',
         notes: '',

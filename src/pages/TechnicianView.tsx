@@ -10,6 +10,7 @@ export default function TechnicianView() {
   const [selectedStatusResume, setSelectedStatusResume] = useState<string>("");
   const [selectedSto, setSelectedSto] = useState<string>("");
   const [selectedTrackerStatus, setSelectedTrackerStatus] = useState<string>("");
+  const [selectedDate, setSelectedDate] = useState<string>("");
   const [loading, setLoading] = useState(true);
   const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
   const [confirmData, setConfirmData] = useState<any>(null);
@@ -70,6 +71,7 @@ export default function TechnicianView() {
 
   const uniqueStatusResumes = Array.from(new Set(tasks.map(t => t.statusResume))).filter(Boolean).sort();
   const uniqueStos = Array.from(new Set(tasks.map(t => t.sto))).filter(Boolean).sort();
+  const uniqueDates = Array.from(new Set(tasks.map(t => t.orderDate))).filter(Boolean).sort().reverse();
   
   let filteredTasks = tasks;
   if (selectedStatusResume) {
@@ -80,6 +82,9 @@ export default function TechnicianView() {
   }
   if (selectedTrackerStatus) {
     filteredTasks = filteredTasks.filter(t => t.trackerStatus === selectedTrackerStatus);
+  }
+  if (selectedDate) {
+    filteredTasks = filteredTasks.filter(t => t.orderDate === selectedDate);
   }
 
   const tasksForCounts = selectedSto ? tasks.filter(t => t.sto === selectedSto) : tasks;
@@ -110,28 +115,41 @@ export default function TechnicianView() {
           </select>
 
           {tasks.length > 0 && (
-            <div className="mt-3 flex gap-2">
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Filter STO</label>
+            <div className="mt-3 grid grid-cols-2 gap-2">
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter Tanggal</label>
                 <select 
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs"
+                  value={selectedDate}
+                  onChange={(e) => setSelectedDate(e.target.value)}
+                >
+                  <option value="">Semua Tanggal</option>
+                  {uniqueDates.map(d => (
+                    <option key={d} value={d}>{d}</option>
+                  ))}
+                </select>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter STO</label>
+                <select 
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs"
                   value={selectedSto}
                   onChange={(e) => setSelectedSto(e.target.value)}
                 >
-                  <option value="">-- Semua STO --</option>
+                  <option value="">Semua STO</option>
                   {uniqueStos.map(s => (
                     <option key={s} value={s}>{s}</option>
                   ))}
                 </select>
               </div>
-              <div className="flex-1">
-                <label className="block text-sm font-semibold text-slate-700 mb-2">Filter Status EBIS</label>
+              <div className="col-span-2">
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter Status EBIS</label>
                 <select 
-                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2.5 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm"
+                  className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs"
                   value={selectedStatusResume}
                   onChange={(e) => setSelectedStatusResume(e.target.value)}
                 >
-                  <option value="">-- Semua Status --</option>
+                  <option value="">Semua Status</option>
                   {uniqueStatusResumes.map(s => (
                     <option key={s} value={s}>{s}</option>
                   ))}

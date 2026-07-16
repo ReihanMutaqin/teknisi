@@ -3,6 +3,7 @@ import { getAllTasks } from "../lib/db";
 import type { TaskData } from "../lib/db";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Loader2 } from "lucide-react";
+import { DataTable } from "../components/DataTable";
 
 const COLORS = {
   'Completed': '#10b981', // green
@@ -16,6 +17,7 @@ export default function ManagerDashboard() {
   const [tasks, setTasks] = useState<TaskData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWitel, setSelectedWitel] = useState<string>("ALL");
+  const [selectedDate, setSelectedDate] = useState<string>("ALL");
   const [activityFilterSto, setActivityFilterSto] = useState<string>("ALL");
   const [activityFilterStatus, setActivityFilterStatus] = useState<string>("ALL");
 
@@ -42,10 +44,20 @@ export default function ManagerDashboard() {
     return ["JAKSEL", "JAKTIM", "JAKPUS"];
   }, []);
 
+  const dates = useMemo(() => {
+    return Array.from(new Set(tasks.map(t => t.orderDate))).filter(Boolean).sort().reverse();
+  }, [tasks]);
+
   const filteredTasks = useMemo(() => {
-    if (selectedWitel === "ALL") return tasks;
-    return tasks.filter(t => t.witel === selectedWitel);
-  }, [tasks, selectedWitel]);
+    let result = tasks;
+    if (selectedWitel !== "ALL") {
+      result = result.filter(t => t.witel === selectedWitel);
+    }
+    if (selectedDate !== "ALL") {
+      result = result.filter(t => t.orderDate === selectedDate);
+    }
+    return result;
+  }, [tasks, selectedWitel, selectedDate]);
 
   const stats = useMemo(() => {
     const counts: Record<string, number> = {
@@ -113,20 +125,35 @@ export default function ManagerDashboard() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200">
+      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-4">
         <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-slate-500">Filter Area:</span>
-          <select 
-            className="bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-purple-500 focus:border-purple-500 outline-none text-sm font-semibold"
-            value={selectedWitel}
-            onChange={(e) => setSelectedWitel(e.target.value)}
-          >
-            <option value="ALL">Semua WITEL</option>
-            {witels.map(w => (
-              <option key={w} value={w}>{w}</option>
-            ))}
-          </select>
+        <div className="flex flex-wrap items-center gap-3">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-500">Tanggal:</span>
+            <select 
+              className="bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-semibold"
+              value={selectedDate}
+              onChange={(e) => setSelectedDate(e.target.value)}
+            >
+              <option value="ALL">Semua Tanggal</option>
+              {dates.map(d => (
+                <option key={d} value={d}>{d}</option>
+              ))}
+            </select>
+          </div>
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-slate-500">Area:</span>
+            <select 
+              className="bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-semibold"
+              value={selectedWitel}
+              onChange={(e) => setSelectedWitel(e.target.value)}
+            >
+              <option value="ALL">Semua WITEL</option>
+              {witels.map(w => (
+                <option key={w} value={w}>{w}</option>
+              ))}
+            </select>
+          </div>
         </div>
       </div>
 
@@ -268,6 +295,8 @@ export default function ManagerDashboard() {
            </div>
         </div>
       </div>
+
+      <DataTable data={filteredTasks} />
     </div>
   );
 }
