@@ -1,5 +1,5 @@
 import { db } from "./firebase";
-import { collection, getDocs, updateDoc, doc, setDoc, query, where, writeBatch } from "firebase/firestore";
+import { collection, getDocs, updateDoc, doc, query, where, writeBatch } from "firebase/firestore";
 import localforage from "localforage";
 
 export interface TaskData {

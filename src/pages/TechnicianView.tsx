@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
-import { getTasksByWitel, updateTaskStatus, getAllTasks } from "../lib/db";
+import { getTasksByWitel, updateTaskStatus } from "../lib/db";
 import type { TaskData } from "../lib/db";
-import { MapPin, Phone, User, Clock, CheckCircle, AlertTriangle, XCircle, Loader2 } from "lucide-react";
+import { MapPin, User, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 
 export default function TechnicianView() {
   const [witels, setWitels] = useState<string[]>([]);
