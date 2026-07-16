@@ -1,4 +1,5 @@
 import { useState, useMemo, useRef, useEffect } from "react";
+import * as XLSX from "xlsx";
 import type { TaskData } from "../lib/db";
 import { Filter, X, Download } from "lucide-react";
 
@@ -86,29 +87,27 @@ export function DataTable({ data }: DataTableProps) {
     }
 
     const exportCols = [...COLUMNS, { key: 'notes', label: 'CATATAN TEKNISI' }, { key: 'technicianName', label: 'NAMA TEKNISI' }];
-    const headers = exportCols.map(c => c.label).join(',');
-    const csvRows = [headers];
-
-    for (const row of toExport) {
-      const values = exportCols.map(col => {
-        let val = String((row as any)[col.key] || '').replace(/"/g, '""');
+    
+    const exportData = toExport.map(row => {
+      const obj: any = {};
+      exportCols.forEach(col => {
+        let val = String((row as any)[col.key] || '');
         if (col.key === 'orderDate') {
           val = val.split(' ')[0];
         }
-        return `"${val}"`;
+        obj[col.label] = val;
       });
-      csvRows.push(values.join(','));
-    }
+      return obj;
+    });
 
-    const blob = new Blob(["\ufeff" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement("a");
-    link.href = url;
-    link.download = `export_${exportStatus === 'ALL' ? 'semua' : exportStatus}_${new Date().getTime()}.csv`;
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
-    URL.revokeObjectURL(url);
+    const worksheet = XLSX.utils.json_to_sheet(exportData);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Data EBIS");
+    
+    // Beri sedikit jarak agar rapi
+    worksheet['!cols'] = exportCols.map(() => ({ wch: 25 }));
+
+    XLSX.writeFile(workbook, `export_${exportStatus === 'ALL' ? 'semua' : exportStatus}_${new Date().getTime()}.xlsx`);
   };
 
   const filteredData = useMemo(() => {
@@ -185,7 +184,7 @@ export function DataTable({ data }: DataTableProps) {
             className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors shadow-sm"
           >
             <Download className="w-4 h-4" />
-            Export CSV
+            Export Excel
           </button>
         </div>
       </div>
