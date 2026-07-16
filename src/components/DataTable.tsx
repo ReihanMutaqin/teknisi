@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import type { TaskData } from "../lib/db";
-import { Filter, X } from "lucide-react";
+import { Filter, X, Download } from "lucide-react";
 
 interface DataTableProps {
   data: TaskData[];
@@ -45,6 +45,8 @@ export function DataTable({ data }: DataTableProps) {
   const [selectedRow, setSelectedRow] = useState<TaskData | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
+  const [exportStatus, setExportStatus] = useState<string>("ALL");
+
   // Close filter dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -55,6 +57,59 @@ export function DataTable({ data }: DataTableProps) {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  const handleExport = () => {
+    let toExport = data;
+    
+    // First, apply current table filters so it respects WITEL, Date, etc. if selected
+    toExport = toExport.filter(row => {
+      for (const key of Object.keys(filters) as ColumnKey[]) {
+        const activeFilters = filters[key];
+        if (activeFilters && activeFilters.size > 0) {
+          const val = getFilterValue(key, String(row[key] || ''));
+          if (!activeFilters.has(val)) {
+            return false;
+          }
+        }
+      }
+      return true;
+    });
+
+    // Then apply the specific export status dropdown filter
+    if (exportStatus !== "ALL") {
+      toExport = toExport.filter(d => d.trackerStatus === exportStatus);
+    }
+    
+    if (toExport.length === 0) {
+      alert("Tidak ada data untuk diexport!");
+      return;
+    }
+
+    const exportCols = [...COLUMNS, { key: 'notes', label: 'CATATAN TEKNISI' }, { key: 'technicianName', label: 'NAMA TEKNISI' }];
+    const headers = exportCols.map(c => c.label).join(',');
+    const csvRows = [headers];
+
+    for (const row of toExport) {
+      const values = exportCols.map(col => {
+        let val = String((row as any)[col.key] || '').replace(/"/g, '""');
+        if (col.key === 'orderDate') {
+          val = val.split(' ')[0];
+        }
+        return `"${val}"`;
+      });
+      csvRows.push(values.join(','));
+    }
+
+    const blob = new Blob(["\ufeff" + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = `export_${exportStatus === 'ALL' ? 'semua' : exportStatus}_${new Date().getTime()}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   const filteredData = useMemo(() => {
     return data.filter(row => {
@@ -105,10 +160,33 @@ export function DataTable({ data }: DataTableProps) {
 
   return (
     <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col mt-6">
-      <div className="p-4 border-b border-slate-200 flex justify-between items-center bg-slate-50">
-        <h2 className="text-lg font-bold text-slate-800">Full Detail Order</h2>
-        <div className="text-sm text-slate-500 font-medium">
-          Menampilkan {filteredData.length} dari {data.length} data
+      <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 gap-4">
+        <div>
+          <h2 className="text-lg font-bold text-slate-800">Full Detail Order</h2>
+          <div className="text-sm text-slate-500 font-medium">
+            Menampilkan {filteredData.length} dari {data.length} data
+          </div>
+        </div>
+        <div className="flex items-center gap-2">
+          <select
+            className="bg-white border border-slate-300 text-slate-700 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none font-semibold"
+            value={exportStatus}
+            onChange={(e) => setExportStatus(e.target.value)}
+          >
+            <option value="ALL">Semua Status</option>
+            <option value="Completed">Completed</option>
+            <option value="Kendala">Kendala</option>
+            <option value="On Progress">On Progress</option>
+            <option value="Pending">Pending</option>
+            <option value="Cancel">Cancel</option>
+          </select>
+          <button 
+            onClick={handleExport}
+            className="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg font-semibold text-sm transition-colors shadow-sm"
+          >
+            <Download className="w-4 h-4" />
+            Export CSV
+          </button>
         </div>
       </div>
       
