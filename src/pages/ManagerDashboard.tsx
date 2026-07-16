@@ -129,7 +129,7 @@ export default function ManagerDashboard() {
         <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
         <div className="flex flex-wrap items-center gap-3">
           <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-slate-500">Tanggal:</span>
+            <span className="text-sm font-medium text-slate-500">Last Update:</span>
             <select 
               className="bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-sm font-semibold"
               value={selectedDate}

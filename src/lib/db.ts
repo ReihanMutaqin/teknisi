@@ -54,7 +54,7 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           internet: item['INTERNET'] || '',
           statusMessage: item['STATUS MESSAGE'] || '',
           sto: item['STO'] || '',
-          orderDate: item['ORDER DATE'] || item['TGL ORDER'] || item['LAST UPDATE STATUS'] || '',
+          orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
           updatedAt: new Date().toISOString()
         };
         added++;
@@ -97,7 +97,7 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         internet: item['INTERNET'] || '',
         statusMessage: item['STATUS MESSAGE'] || '',
         sto: item['STO'] || '',
-        orderDate: item['ORDER DATE'] || item['TGL ORDER'] || item['LAST UPDATE STATUS'] || '',
+        orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
         updatedAt: new Date().toISOString()
       };
       

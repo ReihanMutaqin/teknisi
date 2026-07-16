@@ -11,7 +11,7 @@ type ColumnKey = 'witel' | 'sto' | 'orderDate' | 'segmen' | 'paket' | 'order' | 
 const COLUMNS: { key: ColumnKey, label: string }[] = [
   { key: 'witel', label: 'WITEL' },
   { key: 'sto', label: 'STO' },
-  { key: 'orderDate', label: 'ORDER DATE' },
+  { key: 'orderDate', label: 'LAST UPDATE STATUS' },
   { key: 'segmen', label: 'SEGMEN' },
   { key: 'paket', label: 'PAKET' },
   { key: 'order', label: 'NO ORDER' },
