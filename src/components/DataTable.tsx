@@ -139,13 +139,24 @@ export function DataTable({ data }: DataTableProps) {
          
          // Apply color to Status column
          if (colNumber === statusColIndex) {
-           cell.font = { bold: true };
            const statusText = String(cell.value).toUpperCase();
-           if (statusText === 'COMPLETED') cell.font.color = { argb: 'FF10B981' }; // Green
-           else if (statusText === 'ON PROGRESS') cell.font.color = { argb: 'FF3B82F6' }; // Blue
-           else if (statusText === 'KENDALA') cell.font.color = { argb: 'FFF59E0B' }; // Amber/Orange
-           else if (statusText === 'CANCEL') cell.font.color = { argb: 'FFEF4444' }; // Red
-           else if (statusText === 'PENDING') cell.font.color = { argb: 'FF94A3B8' }; // Slate
+           let bgColor = '';
+           if (statusText === 'COMPLETED') bgColor = 'FF10B981'; // Green
+           else if (statusText === 'ON PROGRESS') bgColor = 'FF3B82F6'; // Blue
+           else if (statusText === 'KENDALA') bgColor = 'FFF59E0B'; // Amber
+           else if (statusText === 'CANCEL') bgColor = 'FFEF4444'; // Red
+           else if (statusText === 'PENDING') bgColor = 'FF94A3B8'; // Slate
+           
+           if (bgColor) {
+             cell.fill = {
+               type: 'pattern',
+               pattern: 'solid',
+               fgColor: { argb: bgColor }
+             };
+             cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
+           } else {
+             cell.font = { bold: true };
+           }
          }
       });
     });
