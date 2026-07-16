@@ -17,6 +17,16 @@ export default function ManagerDashboard() {
   const [loading, setLoading] = useState(true);
   const [selectedWitel, setSelectedWitel] = useState<string>("ALL");
 
+  const getStatusColor = (status: string) => {
+    switch (status) {
+      case 'Completed': return 'bg-green-100 text-green-800 border-green-200';
+      case 'On Progress': return 'bg-blue-100 text-blue-800 border-blue-200';
+      case 'Kendala': return 'bg-orange-100 text-orange-800 border-orange-200';
+      case 'Cancel': return 'bg-red-100 text-red-800 border-red-200';
+      default: return 'bg-slate-100 text-slate-800 border-slate-200';
+    }
+  };
+
   useEffect(() => {
     async function fetchTasks() {
       const all = await getAllTasks();
@@ -179,6 +189,37 @@ export default function ManagerDashboard() {
               ))}
               {filteredTasks.filter(t => t.trackerStatus === 'Kendala' && t.notes).length === 0 && (
                 <p className="text-sm text-slate-500 text-center py-8">Tidak ada laporan kendala saat ini.</p>
+              )}
+           </div>
+        </div>
+        
+        {/* Aktivitas Teknisi Card */}
+        <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-200 flex flex-col overflow-y-auto max-h-[400px]">
+           <h2 className="text-lg font-bold text-blue-700 mb-4 sticky top-0 bg-white pb-2 border-b border-blue-100 flex items-center gap-2">
+             👨‍🔧 Aktivitas Teknisi Lapangan
+           </h2>
+           <div className="space-y-4">
+              {filteredTasks
+                .filter(t => t.technicianName && t.trackerStatus !== 'Pending')
+                .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+                .slice(0, 15)
+                .map(t => (
+                <div key={t.id} className="border-b border-slate-100 pb-3 last:border-0 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="font-bold text-slate-800 text-sm">{t.order}</span>
+                    <span className="text-xs font-bold text-slate-500">{t.witel} - {t.sto}</span>
+                  </div>
+                  <div className="flex justify-between items-center mt-2">
+                    <p className="text-xs text-slate-700 font-bold">Teknisi: <span className="text-blue-700">{t.technicianName}</span></p>
+                    <span className={`px-2 py-0.5 rounded text-[10px] font-bold border ${getStatusColor(t.trackerStatus)}`}>
+                      {t.trackerStatus}
+                    </span>
+                  </div>
+                  <p className="text-xs text-slate-500 mt-1 font-medium">{t.customerName}</p>
+                </div>
+              ))}
+              {filteredTasks.filter(t => t.technicianName && t.trackerStatus !== 'Pending').length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-8">Belum ada pekerjaan yang diambil teknisi.</p>
               )}
            </div>
         </div>
