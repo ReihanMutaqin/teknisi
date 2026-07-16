@@ -25,7 +25,10 @@ const COLUMNS: { key: ColumnKey, label: string }[] = [
 const getFilterValue = (key: ColumnKey, rawVal: string) => {
   if (!rawVal) return '';
   const val = String(rawVal);
-  if (key === 'orderDate') return val.split(' ')[0];
+  if (key === 'orderDate') {
+    const parts = val.split(' ')[0].split('-');
+    return parts.length >= 2 ? `${parts[0]}-${parts[1]}` : val;
+  }
   if (key === 'statusMessage') {
     // Aggressive truncation: split by common delimiters to get the core message
     let clean = val.split(',')[0].split('.')[0].split('-')[0].trim();

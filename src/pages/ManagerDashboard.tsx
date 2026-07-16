@@ -45,7 +45,11 @@ export default function ManagerDashboard() {
   }, []);
 
   const dates = useMemo(() => {
-    return Array.from(new Set(tasks.map(t => (t.orderDate || '').split(' ')[0]))).filter(Boolean).sort().reverse();
+    return Array.from(new Set(tasks.map(t => {
+      const parts = (t.orderDate || '').split(' ')[0].split('-');
+      if (parts.length >= 2) return `${parts[0]}-${parts[1]}`;
+      return '';
+    }))).filter(Boolean).sort().reverse();
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {
@@ -54,7 +58,11 @@ export default function ManagerDashboard() {
       result = result.filter(t => t.witel === selectedWitel);
     }
     if (selectedDate !== "ALL") {
-      result = result.filter(t => (t.orderDate || '').split(' ')[0] === selectedDate);
+      result = result.filter(t => {
+        const parts = (t.orderDate || '').split(' ')[0].split('-');
+        const m = parts.length >= 2 ? `${parts[0]}-${parts[1]}` : '';
+        return m === selectedDate;
+      });
     }
     return result;
   }, [tasks, selectedWitel, selectedDate]);
@@ -135,7 +143,7 @@ export default function ManagerDashboard() {
               value={selectedDate}
               onChange={(e) => setSelectedDate(e.target.value)}
             >
-              <option value="ALL">Semua Tanggal</option>
+              <option value="ALL">Semua Bulan</option>
               {dates.map(d => (
                 <option key={d} value={d}>{d}</option>
               ))}

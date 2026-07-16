@@ -71,7 +71,11 @@ export default function TechnicianView() {
 
   const uniqueStatusResumes = Array.from(new Set(tasks.map(t => t.statusResume))).filter(Boolean).sort();
   const uniqueStos = Array.from(new Set(tasks.map(t => t.sto))).filter(Boolean).sort();
-  const uniqueDates = Array.from(new Set(tasks.map(t => (t.orderDate || '').split(' ')[0]))).filter(Boolean).sort().reverse();
+  const uniqueDates = Array.from(new Set(tasks.map(t => {
+    const parts = (t.orderDate || '').split(' ')[0].split('-');
+    if (parts.length >= 2) return `${parts[0]}-${parts[1]}`;
+    return '';
+  }))).filter(Boolean).sort().reverse();
   
   let filteredTasks = tasks;
   if (selectedStatusResume) {
@@ -84,7 +88,11 @@ export default function TechnicianView() {
     filteredTasks = filteredTasks.filter(t => t.trackerStatus === selectedTrackerStatus);
   }
   if (selectedDate) {
-    filteredTasks = filteredTasks.filter(t => (t.orderDate || '').split(' ')[0] === selectedDate);
+    filteredTasks = filteredTasks.filter(t => {
+      const parts = (t.orderDate || '').split(' ')[0].split('-');
+      const m = parts.length >= 2 ? `${parts[0]}-${parts[1]}` : '';
+      return m === selectedDate;
+    });
   }
 
   const tasksForCounts = selectedSto ? tasks.filter(t => t.sto === selectedSto) : tasks;
@@ -117,13 +125,13 @@ export default function TechnicianView() {
           {tasks.length > 0 && (
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter Tanggal</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter Bulan</label>
                 <select 
                   className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs"
                   value={selectedDate}
                   onChange={(e) => setSelectedDate(e.target.value)}
                 >
-                  <option value="">Semua Tanggal</option>
+                  <option value="">Semua Bulan</option>
                   {uniqueDates.map(d => (
                     <option key={d} value={d}>{d}</option>
                   ))}
