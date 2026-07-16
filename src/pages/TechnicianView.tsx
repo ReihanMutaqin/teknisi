@@ -142,7 +142,7 @@ export default function TechnicianView() {
         </div>
 
         {selectedWitel && tasks.length > 0 && (
-          <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex gap-2 overflow-x-auto scrollbar-hide shrink-0">
+          <div className="bg-white p-3 rounded-xl shadow-sm border border-slate-200 flex gap-2 overflow-x-auto scrollbar-hide shrink-0 sticky top-16 z-30">
             {Object.entries(statusCounts).map(([status, count]) => (
               <div 
                 key={status} 
