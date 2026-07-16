@@ -1,10 +1,13 @@
 import { Link } from "react-router-dom";
 import { Users, LayoutDashboard, Upload } from "lucide-react";
+import { GoogleAd } from "../components/GoogleAd";
 
 export default function HomePage() {
   return (
     <div className="max-w-4xl mx-auto space-y-8">
-      <div className="text-center space-y-4">
+      <GoogleAd />
+      
+      <div className="text-center space-y-4 mt-8">
         <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Selamat Datang di EBIS Tracker</h1>
         <p className="text-xl text-slate-500">Pilih peran Anda untuk melanjutkan ke dashboard yang sesuai.</p>
       </div>
