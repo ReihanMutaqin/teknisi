@@ -92,9 +92,10 @@ export default function ManagerDashboard() {
     const grouped: Record<string, any> = {};
     tasks.forEach(t => {
       if (!grouped[t.witel]) {
-        grouped[t.witel] = { witel: t.witel, Completed: 0, 'On Progress': 0, Kendala: 0, Cancel: 0, Pending: 0 };
+        grouped[t.witel] = { witel: t.witel, Completed: 0, 'On Progress': 0, Kendala: 0, Cancel: 0, Pending: 0, total: 0 };
       }
       grouped[t.witel][t.trackerStatus] += 1;
+      grouped[t.witel].total += 1;
     });
     return Object.values(grouped);
   }, [tasks, selectedWitel]);
@@ -105,9 +106,10 @@ export default function ManagerDashboard() {
     filteredTasks.forEach(t => {
       const stoName = t.sto || 'UNKNOWN';
       if (!grouped[stoName]) {
-        grouped[stoName] = { sto: stoName, Completed: 0, 'On Progress': 0, Kendala: 0, Cancel: 0, Pending: 0 };
+        grouped[stoName] = { sto: stoName, Completed: 0, 'On Progress': 0, Kendala: 0, Cancel: 0, Pending: 0, total: 0 };
       }
       grouped[stoName][t.trackerStatus] += 1;
+      grouped[stoName].total += 1;
     });
     return Object.values(grouped);
   }, [filteredTasks, selectedWitel]);
@@ -189,10 +191,12 @@ export default function ManagerDashboard() {
             <PieChart>
               <Pie
                 data={pieData}
-                innerRadius={80}
-                outerRadius={120}
+                innerRadius={60}
+                outerRadius={100}
                 paddingAngle={5}
                 dataKey="value"
+                label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(1)}%` : ''}
+                labelLine={true}
               >
                 {pieData.map((entry, index) => (
                   <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
@@ -211,7 +215,7 @@ export default function ManagerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="witel" tick={{fontSize: 12}} />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value: number, name: string, props: any) => [`${value} (${((value / props.payload.total) * 100).toFixed(1)}%)`, name]} />
                 <Bar dataKey="Completed" stackId="a" fill={COLORS['Completed']} />
                 <Bar dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} />
                 <Bar dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} />
@@ -228,7 +232,7 @@ export default function ManagerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="sto" tick={{fontSize: 10}} />
                 <YAxis />
-                <Tooltip />
+                <Tooltip formatter={(value: number, name: string, props: any) => [`${value} (${((value / props.payload.total) * 100).toFixed(1)}%)`, name]} />
                 <Bar dataKey="Completed" stackId="a" fill={COLORS['Completed']} />
                 <Bar dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} />
                 <Bar dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} />
