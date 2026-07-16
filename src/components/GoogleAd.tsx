@@ -11,7 +11,7 @@ export function GoogleAd() {
   }, []);
 
   return (
-    <div className="w-full overflow-hidden flex justify-center bg-slate-50 border border-slate-200 rounded-xl p-2 my-6">
+    <div className="w-full overflow-hidden flex justify-center my-6 min-h-[90px]">
       {/* 
         Ganti data-ad-client dan data-ad-slot sesuai dengan kode dari Google AdSense Anda
       */}
