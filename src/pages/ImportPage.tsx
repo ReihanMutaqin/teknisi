@@ -17,6 +17,24 @@ export default function ImportPage() {
       try {
         setLoading(true);
         setStatus('idle');
+
+        // Verify with ReCAPTCHA
+        if (typeof window !== 'undefined' && (window as any).grecaptcha) {
+          await new Promise<void>((resolve, reject) => {
+            (window as any).grecaptcha.enterprise.ready(async () => {
+              try {
+                const token = await (window as any).grecaptcha.enterprise.execute('6LdEbFYtAAAAAIFtE1kERXJu-U3tYAZEv2l2Qmwf', {action: 'upload_json'});
+                console.log("ReCAPTCHA Token:", token);
+                // Here you would normally send the token to your backend (which uses the Secret Key) to get the assessment score.
+                resolve();
+              } catch (e) {
+                console.error("ReCAPTCHA Error:", e);
+                reject(new Error("Gagal memverifikasi reCAPTCHA. Coba lagi."));
+              }
+            });
+          });
+        }
+
         const content = event.target?.result as string;
         const dataList = JSON.parse(content);
         
