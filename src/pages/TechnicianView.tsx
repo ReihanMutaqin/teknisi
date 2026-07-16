@@ -117,7 +117,7 @@ export default function TechnicianView() {
           {tasks.length > 0 && (
             <div className="mt-3 grid grid-cols-2 gap-2">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter Last Update</label>
+                <label className="block text-xs font-semibold text-slate-700 mb-1">Filter Tanggal</label>
                 <select 
                   className="w-full bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-2 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs"
                   value={selectedDate}

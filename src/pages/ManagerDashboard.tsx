@@ -45,7 +45,7 @@ export default function ManagerDashboard() {
   }, []);
 
   const dates = useMemo(() => {
-    return Array.from(new Set(tasks.map(t => (t.orderDate || '').split(' ')[0]))).filter(Boolean).sort().reverse();
+    return Array.from(new Set(tasks.map(t => (t.lastUpdateStatus || '').split(' ')[0]))).filter(Boolean).sort().reverse();
   }, [tasks]);
 
   const filteredTasks = useMemo(() => {
@@ -54,7 +54,7 @@ export default function ManagerDashboard() {
       result = result.filter(t => t.witel === selectedWitel);
     }
     if (selectedDate !== "ALL") {
-      result = result.filter(t => (t.orderDate || '').split(' ')[0] === selectedDate);
+      result = result.filter(t => (t.lastUpdateStatus || '').split(' ')[0] === selectedDate);
     }
     return result;
   }, [tasks, selectedWitel, selectedDate]);

@@ -19,6 +19,7 @@ export interface TaskData {
   statusMessage: string;
   sto: string;
   orderDate: string;
+  lastUpdateStatus?: string;
   updatedAt: string;
 }
 
@@ -54,7 +55,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           internet: item['INTERNET'] || '',
           statusMessage: item['STATUS MESSAGE'] || '',
           sto: item['STO'] || '',
-          orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
+          orderDate: item['ORDER DATE'] || item['TGL ORDER'] || '',
+          lastUpdateStatus: item['LAST UPDATE STATUS'] || '',
           updatedAt: new Date().toISOString()
         };
         added++;
@@ -97,7 +99,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         internet: item['INTERNET'] || '',
         statusMessage: item['STATUS MESSAGE'] || '',
         sto: item['STO'] || '',
-        orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
+        orderDate: item['ORDER DATE'] || item['TGL ORDER'] || '',
+        lastUpdateStatus: item['LAST UPDATE STATUS'] || '',
         updatedAt: new Date().toISOString()
       };
       
