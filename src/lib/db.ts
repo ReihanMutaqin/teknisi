@@ -47,7 +47,7 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           address: item['ALAMAT'] || '',
           serviceType: item['JENIS LAYANAN'] || '',
           segmen: item['SEGMEN'] || '',
-          paket: item['PAKET'] || '',
+          paket: item['GROUP PAKET'] || item['PAKET'] || '',
           technicianName: '',
           trackerStatus: 'Pending',
           notes: '',
@@ -59,6 +59,23 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         };
         added++;
       } else {
+        // Update existing record to catch any newly mapped fields without wiping trackerStatus/technicianName
+        const old = existing[orderId];
+        existing[orderId] = {
+          ...old,
+          witel: item['WITEL_OLD'] || old.witel,
+          statusResume: item['STATUS RESUME'] || old.statusResume,
+          customerName: item['NAMA CUST'] || old.customerName,
+          address: item['ALAMAT'] || old.address,
+          serviceType: item['JENIS LAYANAN'] || old.serviceType,
+          segmen: item['SEGMEN'] || old.segmen || '',
+          paket: item['GROUP PAKET'] || item['PAKET'] || old.paket || '',
+          internet: item['INTERNET'] || old.internet,
+          statusMessage: item['STATUS MESSAGE'] || old.statusMessage,
+          sto: item['STO'] || old.sto,
+          orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || old.orderDate,
+          updatedAt: new Date().toISOString()
+        };
         duplicates++;
       }
     });
@@ -76,6 +93,22 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
     const orderId = String(item['ORDER'] || `UNKNOWN-${Math.random()}`);
     if (existingIds.has(orderId)) {
       duplicates++;
+      const docRef = doc(db, COLLECTION_NAME, orderId);
+      // Only merge safe fields to not wipe out technician status/notes
+      batch.set(docRef, {
+        witel: item['WITEL_OLD'] || 'UNKNOWN',
+        statusResume: item['STATUS RESUME'] || '',
+        customerName: item['NAMA CUST'] || '',
+        address: item['ALAMAT'] || '',
+        serviceType: item['JENIS LAYANAN'] || '',
+        segmen: item['SEGMEN'] || '',
+        paket: item['GROUP PAKET'] || item['PAKET'] || '',
+        internet: item['INTERNET'] || '',
+        statusMessage: item['STATUS MESSAGE'] || '',
+        sto: item['STO'] || '',
+        orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
+        updatedAt: new Date().toISOString()
+      }, { merge: true });
     } else {
       added++;
       existingIds.add(orderId); // avoid counting duplicates within the same json
@@ -90,7 +123,7 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         address: item['ALAMAT'] || '',
         serviceType: item['JENIS LAYANAN'] || '',
         segmen: item['SEGMEN'] || '',
-        paket: item['PAKET'] || '',
+        paket: item['GROUP PAKET'] || item['PAKET'] || '',
         technicianName: '', 
         trackerStatus: 'Pending',
         notes: '',
