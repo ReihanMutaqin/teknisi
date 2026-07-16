@@ -6,95 +6,96 @@
 ![TailwindCSS](https://img.shields.io/badge/tailwindcss-%2338B2AC.svg?style=for-the-badge&logo=tailwind-css&logoColor=white)
 ![Firebase](https://img.shields.io/badge/firebase-a08021?style=for-the-badge&logo=firebase&logoColor=ffcd34)
 
-**EBIS Task Tracker** is a modern, real-time web application designed to streamline the workflow between field technicians and managers. It provides a centralized platform for tracking work orders, monitoring technician progress, and analyzing overall performance through an interactive dashboard.
+**EBIS Task Tracker** adalah aplikasi web modern dan *real-time* yang dirancang khusus untuk mempermudah alur kerja antara teknisi lapangan dan manajer. Aplikasi ini menyediakan platform terpusat untuk melacak tugas/order, memantau progres teknisi, serta menganalisis performa harian melalui *dashboard* interaktif.
 
-## ✨ Key Features
+## ✨ Fitur Utama
 
-### 👨‍🔧 For Technicians
-- **Live Task Board**: Browse and claim pending work orders effortlessly.
-- **Progress Tracking**: Update status in real-time (`On Progress`, `Completed`, `Kendala`, `Cancel`).
-- **Notes System**: Leave specific notes or issues encountered on the field for managers to review immediately.
+### 👨‍🔧 Untuk Teknisi
+- **Daftar Tugas Langsung (*Live Task Board*)**: Teknisi dapat melihat dan mengambil order pekerjaan yang masih *pending* dengan mudah.
+- **Pembaruan Status (*Progress Tracking*)**: Memperbarui status secara *real-time* (`On Progress`, `Completed`, `Kendala`, `Cancel`).
+- **Sistem Catatan (*Notes*)**: Menambahkan catatan khusus atau kendala yang ditemui di lapangan agar bisa langsung dilihat oleh manajer.
 
-### 📊 For Managers
-- **Real-Time Dashboard**: Get a bird's-eye view of all operations.
-- **Interactive Analytics**: Visual distribution of task statuses and STO (Sentral Telepon Otomat) performance using dynamic charts.
-- **Issue Tracking**: Dedicated feeds to monitor recent technical issues (`Kendala`) and technician activities.
-- **Advanced Export**: Export filtered data to beautifully formatted Excel (`.xlsx`) files with automatic color-coding based on task status.
+### 📊 Untuk Manajer
+- **Dashboard *Real-Time***: Memantau seluruh operasional dari satu layar penuh.
+- **Statistik Interaktif**: Visualisasi data seperti distribusi status tugas dan performa per-STO (Sentral Telepon Otomat) menggunakan grafik interaktif.
+- **Pantauan Kendala**: Kolom khusus untuk memonitor kendala terbaru di lapangan serta aktivitas harian teknisi.
+- **Export Lanjutan**: Mengekspor data yang sudah difilter ke dalam format Excel (`.xlsx`) yang rapi, lengkap dengan kode warna otomatis pada kolom status.
 
-### 🔄 System Operations
-- **Data Import**: Seamlessly import JSON data exported from the main EBIS system to sync the database.
-- **Google reCAPTCHA Enterprise**: Enterprise-grade security to prevent abuse.
-- **AdSense Ready**: Built-in Google AdSense integration.
+### 🔄 Sistem & Operasional
+- **Import Data**: Memasukkan file JSON hasil *export* dari sistem EBIS utama secara langsung ke dalam *database*.
+- **Google reCAPTCHA Enterprise**: Sistem keamanan tingkat tinggi untuk mencegah bot dan penyalahgunaan.
+- **AdSense Ready**: Terintegrasi langsung dengan Google AdSense untuk monetisasi.
 
-## 🛠️ Tech Stack
+## 🛠️ Teknologi yang Digunakan
 
-- **Frontend Framework**: React 18 with Vite
-- **Language**: TypeScript
+- **Frontend Framework**: React 18 dengan Vite
+- **Bahasa**: TypeScript
 - **Styling**: Tailwind CSS
 - **Backend / Database**: Firebase Realtime Database
-- **Data Visualization**: Recharts
-- **Excel Generation**: ExcelJS
-- **Icons**: Lucide React
+- **Visualisasi Data (Grafik)**: Recharts
+- **Pembuatan Excel**: ExcelJS
+- **Ikon**: Lucide React
 
-## 🚀 Getting Started
+## 🚀 Panduan Instalasi
 
-### Prerequisites
-Make sure you have Node.js and npm installed on your machine.
+### Persyaratan
+Pastikan Anda sudah menginstal Node.js dan npm di komputer Anda.
 
-### Installation
+### Langkah-langkah
 
-1. Clone the repository:
+1. *Clone* repositori ini:
    ```bash
-   git clone https://github.com/yourusername/ebis-task-tracker.git
+   git clone https://github.com/username-anda/ebis-task-tracker.git
    ```
 
-2. Navigate to the project directory:
+2. Masuk ke dalam folder proyek:
    ```bash
    cd ebis-task-tracker
    ```
 
-3. Install the dependencies:
+3. Instal semua dependensi:
    ```bash
    npm install
    ```
 
-### Environment Variables
+### Pengaturan Variabel Lingkungan (*Environment Variables*)
 
-Create a `.env` file in the root directory and add your specific configurations:
+Buat sebuah file bernama `.env` di folder utama (root) proyek dan masukkan konfigurasi Anda:
 
 ```env
-VITE_FIREBASE_API_KEY=your_firebase_api_key
-VITE_FIREBASE_AUTH_DOMAIN=your_firebase_auth_domain
-VITE_FIREBASE_PROJECT_ID=your_firebase_project_id
-VITE_FIREBASE_STORAGE_BUCKET=your_firebase_storage_bucket
-VITE_FIREBASE_MESSAGING_SENDER_ID=your_firebase_messaging_sender_id
-VITE_FIREBASE_APP_ID=your_firebase_app_id
-VITE_FIREBASE_DATABASE_URL=your_firebase_database_url
+VITE_FIREBASE_API_KEY=api_key_firebase_anda
+VITE_FIREBASE_AUTH_DOMAIN=domain_auth_firebase_anda
+VITE_FIREBASE_PROJECT_ID=project_id_firebase_anda
+VITE_FIREBASE_STORAGE_BUCKET=storage_bucket_firebase_anda
+VITE_FIREBASE_MESSAGING_SENDER_ID=sender_id_firebase_anda
+VITE_FIREBASE_APP_ID=app_id_firebase_anda
+VITE_FIREBASE_DATABASE_URL=database_url_firebase_anda
 
 # Google AdSense
-VITE_ADSENSE_CLIENT_ID=your_adsense_id
+VITE_ADSENSE_CLIENT_ID=ca-pub-xxxxxxxxxxxxxxxx
 
 # Google reCAPTCHA Enterprise
-VITE_RECAPTCHA_SITE_KEY=your_recaptcha_key
+VITE_RECAPTCHA_SITE_KEY=site_key_recaptcha_anda
 ```
 
-### Running the App Locally
+### Menjalankan Aplikasi Secara Lokal
 
-Start the Vite development server:
+Jalankan server pengembangan Vite:
 ```bash
 npm run dev
 ```
 
-The application will be available at `http://localhost:5173`.
+Aplikasi akan bisa diakses melalui `http://localhost:5173`.
 
-## 📦 Deployment
+## 📦 Panduan Deployment (Vercel)
 
-This project is optimized for deployment on Vercel. 
-Ensure you add the environment variables defined in `.env` into your Vercel Project Settings before deploying.
+Proyek ini sangat dioptimalkan untuk di-deploy ke **Vercel**. 
+Pastikan Anda memasukkan semua variabel di dalam `.env` ke bagian **Project Settings > Environment Variables** di Vercel sebelum melakukan *deploy*.
 
+Untuk melakukan *build* ke tahap produksi secara manual:
 ```bash
 npm run build
 ```
 
 ---
-*Built with ❤️ for Telkom Indonesia Technicians.*
+*Dibuat dengan ❤️ untuk Teknisi Telkom Indonesia.*
