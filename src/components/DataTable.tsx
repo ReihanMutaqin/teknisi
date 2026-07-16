@@ -116,6 +116,8 @@ export function DataTable({ data }: DataTableProps) {
     });
 
     // Add Data Rows
+    const statusColIndex = exportCols.findIndex(c => c.key === 'trackerStatus') + 1;
+
     toExport.forEach(row => {
       const rowData = exportCols.map(col => {
         let val = String((row as any)[col.key] || '');
@@ -126,7 +128,7 @@ export function DataTable({ data }: DataTableProps) {
       });
       
       const dataRow = worksheet.addRow(rowData);
-      dataRow.eachCell(cell => {
+      dataRow.eachCell((cell, colNumber) => {
          cell.border = {
           top: { style: 'thin' },
           left: { style: 'thin' },
@@ -134,6 +136,17 @@ export function DataTable({ data }: DataTableProps) {
           right: { style: 'thin' }
          };
          cell.alignment = { vertical: 'middle', wrapText: true };
+         
+         // Apply color to Status column
+         if (colNumber === statusColIndex) {
+           cell.font = { bold: true };
+           const statusText = String(cell.value).toUpperCase();
+           if (statusText === 'COMPLETED') cell.font.color = { argb: 'FF10B981' }; // Green
+           else if (statusText === 'ON PROGRESS') cell.font.color = { argb: 'FF3B82F6' }; // Blue
+           else if (statusText === 'KENDALA') cell.font.color = { argb: 'FFF59E0B' }; // Amber/Orange
+           else if (statusText === 'CANCEL') cell.font.color = { argb: 'FFEF4444' }; // Red
+           else if (statusText === 'PENDING') cell.font.color = { argb: 'FF94A3B8' }; // Slate
+         }
       });
     });
 
