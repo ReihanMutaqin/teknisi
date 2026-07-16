@@ -5,6 +5,14 @@ import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis
 import { Loader2 } from "lucide-react";
 import { DataTable } from "../components/DataTable";
 
+const formatMonth = (yyyyMm: string) => {
+  const [year, month] = yyyMm.split('-');
+  if (!year || !month) return yyyMm;
+  const mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const mIdx = parseInt(month, 10) - 1;
+  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyMm;
+};
+
 const COLORS = {
   'Completed': '#10b981', // green
   'On Progress': '#3b82f6', // blue
@@ -145,7 +153,7 @@ export default function ManagerDashboard() {
             >
               <option value="ALL">Semua Bulan</option>
               {dates.map(d => (
-                <option key={d} value={d}>{d}</option>
+                <option key={d} value={d}>{formatMonth(d)}</option>
               ))}
             </select>
           </div>

@@ -2,6 +2,14 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import type { TaskData } from "../lib/db";
 import { Filter, X } from "lucide-react";
 
+const formatMonth = (yyyyMm: string) => {
+  const [year, month] = yyyMm.split('-');
+  if (!year || !month) return yyyMm;
+  const mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+  const mIdx = parseInt(month, 10) - 1;
+  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyMm;
+};
+
 interface DataTableProps {
   data: TaskData[];
 }
@@ -141,6 +149,7 @@ export function DataTable({ data }: DataTableProps) {
                         <div className="max-h-48 overflow-y-auto p-2 space-y-1">
                           {uniqueVals.map(val => {
                             const checked = filters[col.key]?.has(val);
+                            const displayVal = col.key === 'orderDate' ? formatMonth(val) : val;
                             return (
                               <label key={val} className="flex items-center gap-2 p-1 hover:bg-slate-50 rounded cursor-pointer">
                                 <input 
@@ -149,7 +158,7 @@ export function DataTable({ data }: DataTableProps) {
                                   checked={checked || false}
                                   onChange={() => toggleFilter(col.key, val)}
                                 />
-                                <span className="text-xs truncate" title={val}>{val || '(Kosong)'}</span>
+                                <span className="text-xs truncate" title={displayVal}>{displayVal || '(Kosong)'}</span>
                               </label>
                             )
                           })}
@@ -170,10 +179,11 @@ export function DataTable({ data }: DataTableProps) {
                   onClick={() => setSelectedRow(row)}
                 >
                   {COLUMNS.map(col => {
-                    const val = getFilterValue(col.key, String(row[col.key] || ''));
+                    const rawVal = getFilterValue(col.key, String(row[col.key] || ''));
+                    const displayVal = col.key === 'orderDate' ? formatMonth(rawVal) : rawVal;
                     return (
                       <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={String(row[col.key] || '')}>
-                        {val || '-'}
+                        {displayVal || '-'}
                       </td>
                     );
                   })}
