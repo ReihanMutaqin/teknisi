@@ -22,6 +22,18 @@ const COLUMNS: { key: ColumnKey, label: string }[] = [
   { key: 'statusMessage', label: 'STATUS MESSAGE' },
 ];
 
+const getFilterValue = (key: ColumnKey, rawVal: string) => {
+  if (!rawVal) return '';
+  const val = String(rawVal);
+  if (key === 'orderDate') return val.split(' ')[0];
+  if (key === 'statusMessage') {
+    if (val.length > 35) {
+      return val.substring(0, 35).trim() + '...';
+    }
+  }
+  return val;
+};
+
 export function DataTable({ data }: DataTableProps) {
   const [filters, setFilters] = useState<Record<ColumnKey, Set<string>>>({} as Record<ColumnKey, Set<string>>);
   const [openFilter, setOpenFilter] = useState<ColumnKey | null>(null);
@@ -44,10 +56,7 @@ export function DataTable({ data }: DataTableProps) {
       for (const key of Object.keys(filters) as ColumnKey[]) {
         const activeFilters = filters[key];
         if (activeFilters && activeFilters.size > 0) {
-          let val = String(row[key] || '');
-          if (key === 'orderDate') {
-            val = val.split(' ')[0];
-          }
+          const val = getFilterValue(key, String(row[key] || ''));
           if (!activeFilters.has(val)) {
             return false;
           }
@@ -103,13 +112,7 @@ export function DataTable({ data }: DataTableProps) {
           <thead className="text-xs text-slate-600 bg-slate-100 uppercase sticky top-0 z-20 shadow-sm">
             <tr>
               {COLUMNS.map(col => {
-                const uniqueVals = Array.from(new Set(data.map(d => {
-                  let val = String(d[col.key] || '');
-                  if (col.key === 'orderDate') {
-                    val = val.split(' ')[0];
-                  }
-                  return val;
-                }))).sort();
+                const uniqueVals = Array.from(new Set(data.map(d => getFilterValue(col.key, String(d[col.key] || ''))))).sort();
                 const isActive = filters[col.key] && filters[col.key].size > 0;
                 const isOpen = openFilter === col.key;
                 
@@ -161,12 +164,9 @@ export function DataTable({ data }: DataTableProps) {
                   onClick={() => setSelectedRow(row)}
                 >
                   {COLUMNS.map(col => {
-                    let val = String(row[col.key] || '');
-                    if (col.key === 'orderDate') {
-                      val = val.split(' ')[0];
-                    }
+                    const val = getFilterValue(col.key, String(row[col.key] || ''));
                     return (
-                      <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={val}>
+                      <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={String(row[col.key] || '')}>
                         {val || '-'}
                       </td>
                     );
