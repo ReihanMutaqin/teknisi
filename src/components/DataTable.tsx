@@ -43,7 +43,10 @@ export function DataTable({ data }: DataTableProps) {
       for (const key of Object.keys(filters) as ColumnKey[]) {
         const activeFilters = filters[key];
         if (activeFilters && activeFilters.size > 0) {
-          const val = String(row[key] || '');
+          let val = String(row[key] || '');
+          if (key === 'orderDate') {
+            val = val.split(' ')[0];
+          }
           if (!activeFilters.has(val)) {
             return false;
           }
@@ -99,7 +102,13 @@ export function DataTable({ data }: DataTableProps) {
           <thead className="text-xs text-slate-600 bg-slate-100 uppercase sticky top-0 z-20 shadow-sm">
             <tr>
               {COLUMNS.map(col => {
-                const uniqueVals = Array.from(new Set(data.map(d => String(d[col.key] || '')))).sort();
+                const uniqueVals = Array.from(new Set(data.map(d => {
+                  let val = String(d[col.key] || '');
+                  if (col.key === 'orderDate') {
+                    val = val.split(' ')[0];
+                  }
+                  return val;
+                }))).sort();
                 const isActive = filters[col.key] && filters[col.key].size > 0;
                 const isOpen = openFilter === col.key;
                 
@@ -146,11 +155,17 @@ export function DataTable({ data }: DataTableProps) {
             {filteredData.length > 0 ? (
               filteredData.map((row, i) => (
                 <tr key={row.id || i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
-                  {COLUMNS.map(col => (
-                    <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={String(row[col.key] || '')}>
-                      {row[col.key] || '-'}
-                    </td>
-                  ))}
+                  {COLUMNS.map(col => {
+                    let val = String(row[col.key] || '');
+                    if (col.key === 'orderDate') {
+                      val = val.split(' ')[0];
+                    }
+                    return (
+                      <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={val}>
+                        {val || '-'}
+                      </td>
+                    );
+                  })}
                 </tr>
               ))
             ) : (

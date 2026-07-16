@@ -254,7 +254,7 @@ export default function TechnicianView() {
                     </div>
                     <div className="flex justify-between border-b pb-1 border-slate-200">
                       <span className="text-slate-500">Tgl Order:</span>
-                      <span className="font-semibold">{selectedTask.orderDate || '-'}</span>
+                      <span className="font-semibold">{(selectedTask.orderDate || '').split(' ')[0] || '-'}</span>
                     </div>
                     <div className="pt-1">
                       <span className="text-slate-500 block mb-1">Status Resume:</span>
