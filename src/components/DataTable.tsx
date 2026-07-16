@@ -6,12 +6,12 @@ interface DataTableProps {
   data: TaskData[];
 }
 
-type ColumnKey = 'witel' | 'sto' | 'lastUpdateStatus' | 'segmen' | 'paket' | 'order' | 'internet' | 'customerName' | 'address' | 'trackerStatus' | 'statusMessage';
+type ColumnKey = 'witel' | 'sto' | 'orderDate' | 'segmen' | 'paket' | 'order' | 'internet' | 'customerName' | 'address' | 'trackerStatus' | 'statusMessage';
 
 const COLUMNS: { key: ColumnKey, label: string }[] = [
   { key: 'witel', label: 'WITEL' },
   { key: 'sto', label: 'STO' },
-  { key: 'lastUpdateStatus', label: 'LAST UPDATE STATUS' },
+  { key: 'orderDate', label: 'LAST UPDATE STATUS' },
   { key: 'segmen', label: 'SEGMEN' },
   { key: 'paket', label: 'PAKET' },
   { key: 'order', label: 'NO ORDER' },
@@ -25,7 +25,7 @@ const COLUMNS: { key: ColumnKey, label: string }[] = [
 const getFilterValue = (key: ColumnKey, rawVal: string) => {
   if (!rawVal) return '';
   const val = String(rawVal);
-  if (key === 'lastUpdateStatus') return val.split(' ')[0];
+  if (key === 'orderDate') return val.split(' ')[0];
   if (key === 'statusMessage') {
     // Aggressive truncation: split by common delimiters to get the core message
     let clean = val.split(',')[0].split('.')[0].split('-')[0].trim();
@@ -203,7 +203,7 @@ export function DataTable({ data }: DataTableProps) {
             <div className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
               {COLUMNS.map(col => {
                 let val = String(selectedRow[col.key] || '');
-                if (col.key === 'lastUpdateStatus') {
+                if (col.key === 'orderDate') {
                   val = val.split(' ')[0];
                 }
                 return (
