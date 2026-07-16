@@ -6,11 +6,11 @@ import { Loader2 } from "lucide-react";
 import { DataTable } from "../components/DataTable";
 
 const formatMonth = (yyyyMm: string) => {
-  const [year, month] = yyyMm.split('-');
-  if (!year || !month) return yyyMm;
+  const [year, month] = yyyyMm.split('-');
+  if (!year || !month) return yyyyMm;
   const mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
   const mIdx = parseInt(month, 10) - 1;
-  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyMm;
+  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyyMm;
 };
 
 const COLORS = {

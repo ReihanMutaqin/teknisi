@@ -4,11 +4,11 @@ import type { TaskData } from "../lib/db";
 import { MapPin, User, CheckCircle, AlertTriangle, Loader2 } from "lucide-react";
 
 const formatMonth = (yyyyMm: string) => {
-  const [year, month] = yyyMm.split('-');
-  if (!year || !month) return yyyMm;
+  const [year, month] = yyyyMm.split('-');
+  if (!year || !month) return yyyyMm;
   const mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
   const mIdx = parseInt(month, 10) - 1;
-  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyMm;
+  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyyMm;
 };
 
 export default function TechnicianView() {
