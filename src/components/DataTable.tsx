@@ -196,15 +196,15 @@ export function DataTable({ data }: DataTableProps) {
   };
 
   return (
-    <div className="bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden flex flex-col mt-6">
-      <div className="p-4 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50 gap-4">
+    <div className="bg-white rounded-2xl shadow-md border border-slate-200 overflow-hidden flex flex-col mt-6 transition-all duration-300">
+      <div className="p-5 border-b border-slate-200 flex flex-col sm:flex-row justify-between items-start sm:items-center bg-slate-50/80 gap-4">
         <div>
-          <h2 className="text-lg font-bold text-slate-800">Full Detail Order</h2>
-          <div className="text-sm text-slate-500 font-medium">
+          <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Full Detail Order</h2>
+          <div className="text-sm text-slate-500 font-medium mt-1">
             Menampilkan {filteredData.length} dari {data.length} data
           </div>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-3">
           <select
             className="bg-white border border-slate-300 text-slate-700 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none font-semibold"
             value={exportStatus}
@@ -227,9 +227,9 @@ export function DataTable({ data }: DataTableProps) {
         </div>
       </div>
       
-      <div className="overflow-x-auto max-h-[600px] relative">
-        <table className="w-full text-sm text-left">
-          <thead className="text-xs text-slate-600 bg-slate-100 uppercase sticky top-0 z-20 shadow-sm">
+      <div className="overflow-x-auto max-h-[600px] relative rounded-b-2xl">
+        <table className="w-full text-sm text-left border-collapse">
+          <thead className="text-xs text-slate-600 bg-slate-100 uppercase sticky top-0 z-20 shadow-sm ring-1 ring-slate-200">
             <tr>
               {COLUMNS.map(col => {
                 const uniqueVals = Array.from(new Set(data.map(d => getFilterValue(col.key, String(d[col.key] || ''))))).sort();
@@ -237,17 +237,17 @@ export function DataTable({ data }: DataTableProps) {
                 const isOpen = openFilter === col.key;
                 
                 return (
-                  <th key={col.key} className="px-4 py-3 border-b border-slate-200 font-bold whitespace-nowrap bg-slate-100 relative">
+                  <th key={col.key} className="px-5 py-4 border-b border-slate-200 font-extrabold whitespace-nowrap bg-slate-100/95 backdrop-blur-sm relative">
                     <div 
-                      className="flex items-center justify-between gap-2 cursor-pointer hover:text-blue-600 select-none group"
+                      className="flex items-center justify-between gap-3 cursor-pointer hover:text-blue-600 select-none group transition-colors duration-200"
                       onClick={() => setOpenFilter(isOpen ? null : col.key)}
                     >
                       {col.label}
-                      <Filter className={`w-3.5 h-3.5 ${isActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-blue-400'}`} />
+                      <Filter className={`w-4 h-4 transition-transform ${isOpen ? 'text-blue-500 rotate-180' : isActive ? 'text-blue-500' : 'text-slate-400 group-hover:text-blue-400'}`} />
                     </div>
                     
                     {isOpen && (
-                      <div ref={filterRef} className="absolute top-full mt-1 left-0 bg-white border border-slate-200 rounded-lg shadow-xl w-56 z-50 normal-case font-normal text-slate-700">
+                      <div ref={filterRef} className="absolute top-full mt-2 left-0 bg-white border border-slate-200 rounded-xl shadow-xl w-64 z-50 normal-case font-normal text-slate-700 ring-1 ring-black/5">
                         <div className="p-2 border-b border-slate-100 flex justify-between gap-2">
                           <button onClick={() => selectAll(col.key, uniqueVals)} className="text-xs text-blue-600 hover:underline">Semua</button>
                           <button onClick={() => clearFilter(col.key)} className="text-xs text-red-600 hover:underline">Clear</button>
@@ -276,12 +276,12 @@ export function DataTable({ data }: DataTableProps) {
               })}
             </tr>
           </thead>
-          <tbody>
+          <tbody className="divide-y divide-slate-100 bg-white">
             {filteredData.length > 0 ? (
               filteredData.map((row, i) => (
                 <tr 
                   key={row.id || i} 
-                  className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors cursor-pointer"
+                  className="hover:bg-blue-50/60 transition-colors duration-200 cursor-pointer group"
                   onClick={() => setSelectedRow(row)}
                 >
                   {COLUMNS.map(col => {
@@ -292,7 +292,7 @@ export function DataTable({ data }: DataTableProps) {
                       displayVal = getFilterValue(col.key, displayVal);
                     }
                     return (
-                      <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={String(row[col.key] || '')}>
+                      <td key={col.key} className="px-5 py-4 text-slate-700 font-medium truncate max-w-[220px] group-hover:text-slate-900" title={String(row[col.key] || '')}>
                         {displayVal || '-'}
                       </td>
                     );
@@ -301,8 +301,8 @@ export function DataTable({ data }: DataTableProps) {
               ))
             ) : (
               <tr>
-                <td colSpan={COLUMNS.length} className="px-4 py-8 text-center text-slate-500">
-                  Tidak ada data yang sesuai filter.
+                <td colSpan={COLUMNS.length} className="px-5 py-12 text-center">
+                  <div className="text-slate-400 font-medium text-lg">Tidak ada data yang sesuai filter.</div>
                 </td>
               </tr>
             )}
@@ -311,27 +311,27 @@ export function DataTable({ data }: DataTableProps) {
       </div>
 
       {selectedRow && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
-          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-200">
-            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
-              <h2 className="text-lg font-bold text-slate-800">Detail Order: {selectedRow.order}</h2>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-sm transition-opacity">
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-2xl max-h-[90vh] flex flex-col transform transition-all">
+            <div className="p-5 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-2xl">
+              <h2 className="text-xl font-extrabold text-slate-800 tracking-tight">Detail Order: {selectedRow.order}</h2>
               <button 
                 onClick={() => setSelectedRow(null)}
-                className="p-1.5 bg-slate-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
+                className="p-2 bg-white hover:bg-red-500 hover:text-white text-slate-400 rounded-full transition-colors shadow-sm ring-1 ring-slate-200 hover:ring-red-500"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
             
-            <div className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4 bg-slate-50/30">
               {COLUMNS.map(col => {
                 let val = String(selectedRow[col.key] || '');
                 if (col.key === 'orderDate') {
                   val = val.split(' ')[0];
                 }
                 return (
-                  <div key={col.key} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
-                    <span className="block text-xs font-bold text-slate-400 mb-1">{col.label}</span>
+                  <div key={col.key} className="bg-white p-4 rounded-xl border border-slate-200 shadow-sm">
+                    <span className="block text-[11px] font-bold text-slate-400 uppercase tracking-wider mb-1">{col.label}</span>
                     <span className="block text-sm font-semibold text-slate-800 break-words">
                       {val || '-'}
                     </span>
@@ -339,15 +339,15 @@ export function DataTable({ data }: DataTableProps) {
                 );
               })}
               
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 md:col-span-2">
-                <span className="block text-xs font-bold text-slate-400 mb-1">CATATAN TEKNISI</span>
-                <span className="block text-sm font-semibold text-slate-800 break-words">
+              <div className="bg-red-50/50 p-4 rounded-xl border border-red-100 shadow-sm md:col-span-2">
+                <span className="block text-[11px] font-bold text-red-500 uppercase tracking-wider mb-1">CATATAN TEKNISI</span>
+                <span className="block text-sm font-semibold text-red-900 break-words">
                   {selectedRow.notes || 'Tidak ada catatan.'}
                 </span>
               </div>
-              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 md:col-span-2">
-                <span className="block text-xs font-bold text-slate-400 mb-1">NAMA TEKNISI</span>
-                <span className="block text-sm font-semibold text-slate-800 break-words">
+              <div className="bg-blue-50/50 p-4 rounded-xl border border-blue-100 shadow-sm md:col-span-2">
+                <span className="block text-[11px] font-bold text-blue-500 uppercase tracking-wider mb-1">NAMA TEKNISI</span>
+                <span className="block text-sm font-semibold text-blue-900 break-words">
                   {selectedRow.technicianName || 'Belum diambil.'}
                 </span>
               </div>
