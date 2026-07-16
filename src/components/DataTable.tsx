@@ -179,8 +179,12 @@ export function DataTable({ data }: DataTableProps) {
                   onClick={() => setSelectedRow(row)}
                 >
                   {COLUMNS.map(col => {
-                    const rawVal = getFilterValue(col.key, String(row[col.key] || ''));
-                    const displayVal = col.key === 'orderDate' ? formatMonth(rawVal) : rawVal;
+                    let displayVal = String(row[col.key] || '');
+                    if (col.key === 'orderDate') {
+                      displayVal = displayVal.split(' ')[0]; // Only show YYYY-MM-DD, hide time
+                    } else {
+                      displayVal = getFilterValue(col.key, displayVal);
+                    }
                     return (
                       <td key={col.key} className="px-4 py-3 text-slate-700 truncate max-w-[200px]" title={String(row[col.key] || '')}>
                         {displayVal || '-'}
