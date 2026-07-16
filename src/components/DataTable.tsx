@@ -2,14 +2,6 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import type { TaskData } from "../lib/db";
 import { Filter, X } from "lucide-react";
 
-const formatMonth = (yyyyMm: string) => {
-  const [year, month] = yyyyMm.split('-');
-  if (!year || !month) return yyyyMm;
-  const mNames = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-  const mIdx = parseInt(month, 10) - 1;
-  return mIdx >= 0 && mIdx < 12 ? `${mNames[mIdx]} ${year}` : yyyyMm;
-};
-
 interface DataTableProps {
   data: TaskData[];
 }
