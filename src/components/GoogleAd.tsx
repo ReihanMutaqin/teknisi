@@ -18,7 +18,7 @@ export function GoogleAd() {
       <ins
         className="adsbygoogle"
         style={{ display: "block", minWidth: "250px", width: "100%", height: "90px" }}
-        data-ad-client="ca-pub-5291596525422164"
+        data-ad-client={import.meta.env.VITE_ADSENSE_CLIENT_ID || "ca-pub-5291596525422164"}
         data-ad-slot="AUTO"
         data-ad-format="auto"
         data-full-width-responsive="true"
