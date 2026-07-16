@@ -6,13 +6,13 @@ interface DataTableProps {
   data: TaskData[];
 }
 
-type ColumnKey = 'witel' | 'sto' | 'orderDate' | 'segmen' | 'paket' | 'order' | 'internet' | 'customerName' | 'address' | 'trackerStatus' | 'statusMessage';
+type ColumnKey = 'witel' | 'sto' | 'orderDate' | 'unit' | 'paket' | 'order' | 'internet' | 'customerName' | 'address' | 'trackerStatus' | 'statusMessage';
 
 const COLUMNS: { key: ColumnKey, label: string }[] = [
   { key: 'witel', label: 'WITEL' },
   { key: 'sto', label: 'STO' },
   { key: 'orderDate', label: 'LAST UPDATE STATUS' },
-  { key: 'segmen', label: 'SEGMEN' },
+  { key: 'unit', label: 'UNIT' },
   { key: 'paket', label: 'PAKET' },
   { key: 'order', label: 'NO ORDER' },
   { key: 'internet', label: 'NO INTERNET / TELP' },

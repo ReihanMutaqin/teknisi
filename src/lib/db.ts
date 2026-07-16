@@ -10,7 +10,7 @@ export interface TaskData {
   customerName: string;
   address: string;
   serviceType: string;
-  segmen?: string;
+  unit?: string;
   paket?: string;
   technicianName: string;
   trackerStatus: 'Pending' | 'On Progress' | 'Completed' | 'Kendala' | 'Cancel';
@@ -46,8 +46,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           customerName: item['NAMA CUST'] || '',
           address: item['ALAMAT'] || '',
           serviceType: item['JENIS LAYANAN'] || '',
-          segmen: item['SEGMEN'] || '',
-          paket: item['GROUP PAKET'] || item['PAKET'] || '',
+          unit: item['UNIT'] || '',
+          paket: item['JENIS LAYANAN'] || '',
           technicianName: '',
           trackerStatus: 'Pending',
           notes: '',
@@ -68,8 +68,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           customerName: item['NAMA CUST'] || old.customerName,
           address: item['ALAMAT'] || old.address,
           serviceType: item['JENIS LAYANAN'] || old.serviceType,
-          segmen: item['SEGMEN'] || old.segmen || '',
-          paket: item['GROUP PAKET'] || item['PAKET'] || old.paket || '',
+          unit: item['UNIT'] || old.unit || '',
+          paket: item['JENIS LAYANAN'] || old.paket || '',
           internet: item['INTERNET'] || old.internet,
           statusMessage: item['STATUS MESSAGE'] || old.statusMessage,
           sto: item['STO'] || old.sto,
@@ -101,8 +101,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         customerName: item['NAMA CUST'] || '',
         address: item['ALAMAT'] || '',
         serviceType: item['JENIS LAYANAN'] || '',
-        segmen: item['SEGMEN'] || '',
-        paket: item['GROUP PAKET'] || item['PAKET'] || '',
+        unit: item['UNIT'] || '',
+        paket: item['JENIS LAYANAN'] || '',
         internet: item['INTERNET'] || '',
         statusMessage: item['STATUS MESSAGE'] || '',
         sto: item['STO'] || '',
@@ -122,8 +122,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         customerName: item['NAMA CUST'] || '',
         address: item['ALAMAT'] || '',
         serviceType: item['JENIS LAYANAN'] || '',
-        segmen: item['SEGMEN'] || '',
-        paket: item['GROUP PAKET'] || item['PAKET'] || '',
+        unit: item['UNIT'] || '',
+        paket: item['JENIS LAYANAN'] || '',
         technicianName: '', 
         trackerStatus: 'Pending',
         notes: '',
