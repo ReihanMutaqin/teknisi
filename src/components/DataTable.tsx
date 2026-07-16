@@ -1,6 +1,6 @@
 import { useState, useMemo, useRef, useEffect } from "react";
 import type { TaskData } from "../lib/db";
-import { Filter } from "lucide-react";
+import { Filter, X } from "lucide-react";
 
 interface DataTableProps {
   data: TaskData[];
@@ -25,6 +25,7 @@ const COLUMNS: { key: ColumnKey, label: string }[] = [
 export function DataTable({ data }: DataTableProps) {
   const [filters, setFilters] = useState<Record<ColumnKey, Set<string>>>({} as Record<ColumnKey, Set<string>>);
   const [openFilter, setOpenFilter] = useState<ColumnKey | null>(null);
+  const [selectedRow, setSelectedRow] = useState<TaskData | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
   // Close filter dropdown when clicking outside
@@ -154,7 +155,11 @@ export function DataTable({ data }: DataTableProps) {
           <tbody>
             {filteredData.length > 0 ? (
               filteredData.map((row, i) => (
-                <tr key={row.id || i} className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors">
+                <tr 
+                  key={row.id || i} 
+                  className="border-b border-slate-100 hover:bg-blue-50/50 transition-colors cursor-pointer"
+                  onClick={() => setSelectedRow(row)}
+                >
                   {COLUMNS.map(col => {
                     let val = String(row[col.key] || '');
                     if (col.key === 'orderDate') {
@@ -178,6 +183,52 @@ export function DataTable({ data }: DataTableProps) {
           </tbody>
         </table>
       </div>
+
+      {selectedRow && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/50 backdrop-blur-sm">
+          <div className="bg-white rounded-xl shadow-xl w-full max-w-2xl max-h-[90vh] flex flex-col animate-in fade-in zoom-in duration-200">
+            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50 rounded-t-xl">
+              <h2 className="text-lg font-bold text-slate-800">Detail Order: {selectedRow.order}</h2>
+              <button 
+                onClick={() => setSelectedRow(null)}
+                className="p-1.5 bg-slate-200 hover:bg-red-100 hover:text-red-600 rounded-full transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+            
+            <div className="p-6 overflow-y-auto grid grid-cols-1 md:grid-cols-2 gap-4">
+              {COLUMNS.map(col => {
+                let val = String(selectedRow[col.key] || '');
+                if (col.key === 'orderDate') {
+                  val = val.split(' ')[0];
+                }
+                return (
+                  <div key={col.key} className="bg-slate-50 p-3 rounded-lg border border-slate-100">
+                    <span className="block text-xs font-bold text-slate-400 mb-1">{col.label}</span>
+                    <span className="block text-sm font-semibold text-slate-800 break-words">
+                      {val || '-'}
+                    </span>
+                  </div>
+                );
+              })}
+              
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 md:col-span-2">
+                <span className="block text-xs font-bold text-slate-400 mb-1">CATATAN TEKNISI</span>
+                <span className="block text-sm font-semibold text-slate-800 break-words">
+                  {selectedRow.notes || 'Tidak ada catatan.'}
+                </span>
+              </div>
+              <div className="bg-slate-50 p-3 rounded-lg border border-slate-100 md:col-span-2">
+                <span className="block text-xs font-bold text-slate-400 mb-1">NAMA TEKNISI</span>
+                <span className="block text-sm font-semibold text-slate-800 break-words">
+                  {selectedRow.technicianName || 'Belum diambil.'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
