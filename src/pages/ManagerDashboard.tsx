@@ -16,6 +16,8 @@ export default function ManagerDashboard() {
   const [tasks, setTasks] = useState<TaskData[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedWitel, setSelectedWitel] = useState<string>("ALL");
+  const [activityFilterSto, setActivityFilterSto] = useState<string>("ALL");
+  const [activityFilterStatus, setActivityFilterStatus] = useState<string>("ALL");
 
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -81,6 +83,29 @@ export default function ManagerDashboard() {
     });
     return Object.values(grouped);
   }, [filteredTasks, selectedWitel]);
+
+  const activeTasks = useMemo(() => {
+    return filteredTasks.filter(t => t.technicianName && t.trackerStatus !== 'Pending');
+  }, [filteredTasks]);
+
+  const uniqueActivityStos = useMemo(() => {
+    return Array.from(new Set(activeTasks.map(t => t.sto))).filter(Boolean).sort();
+  }, [activeTasks]);
+  
+  const uniqueActivityStatuses = useMemo(() => {
+    return Array.from(new Set(activeTasks.map(t => t.trackerStatus))).filter(Boolean).sort();
+  }, [activeTasks]);
+
+  const displayedActiveTasks = useMemo(() => {
+    let result = activeTasks;
+    if (activityFilterSto !== "ALL") {
+      result = result.filter(t => t.sto === activityFilterSto);
+    }
+    if (activityFilterStatus !== "ALL") {
+      result = result.filter(t => t.trackerStatus === activityFilterStatus);
+    }
+    return result.sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime());
+  }, [activeTasks, activityFilterSto, activityFilterStatus]);
 
   if (loading) {
     return <div className="flex h-[50vh] items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-blue-500" /></div>;
@@ -195,13 +220,32 @@ export default function ManagerDashboard() {
         
         {/* Aktivitas Teknisi Card */}
         <div className="bg-white p-6 rounded-xl shadow-sm border border-blue-200 flex flex-col overflow-y-auto max-h-[400px]">
-           <h2 className="text-lg font-bold text-blue-700 mb-4 sticky top-0 bg-white pb-2 border-b border-blue-100 flex items-center gap-2">
-             👨‍🔧 Aktivitas Teknisi Lapangan
-           </h2>
+           <div className="sticky top-0 bg-white pb-3 border-b border-blue-100 mb-4 z-10">
+             <h2 className="text-lg font-bold text-blue-700 flex items-center gap-2 mb-3">
+               👨‍🔧 Aktivitas Teknisi Lapangan
+             </h2>
+             <div className="flex gap-2">
+               <select 
+                 className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-1.5 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs font-semibold"
+                 value={activityFilterSto}
+                 onChange={(e) => setActivityFilterSto(e.target.value)}
+               >
+                 <option value="ALL">Semua STO</option>
+                 {uniqueActivityStos.map(s => <option key={s} value={s}>{s}</option>)}
+               </select>
+               <select 
+                 className="flex-1 bg-slate-50 border border-slate-200 text-slate-900 rounded-lg p-1.5 focus:ring-blue-500 focus:border-blue-500 outline-none text-xs font-semibold"
+                 value={activityFilterStatus}
+                 onChange={(e) => setActivityFilterStatus(e.target.value)}
+               >
+                 <option value="ALL">Semua Status</option>
+                 {uniqueActivityStatuses.map(s => <option key={s} value={s}>{s}</option>)}
+               </select>
+             </div>
+           </div>
+           
            <div className="space-y-4">
-              {filteredTasks
-                .filter(t => t.technicianName && t.trackerStatus !== 'Pending')
-                .sort((a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime())
+              {displayedActiveTasks
                 .slice(0, 15)
                 .map(t => (
                 <div key={t.id} className="border-b border-slate-100 pb-3 last:border-0 bg-blue-50/50 p-3 rounded-lg border border-blue-100">
@@ -218,8 +262,8 @@ export default function ManagerDashboard() {
                   <p className="text-xs text-slate-500 mt-1 font-medium">{t.customerName}</p>
                 </div>
               ))}
-              {filteredTasks.filter(t => t.technicianName && t.trackerStatus !== 'Pending').length === 0 && (
-                <p className="text-sm text-slate-500 text-center py-8">Belum ada pekerjaan yang diambil teknisi.</p>
+              {displayedActiveTasks.length === 0 && (
+                <p className="text-sm text-slate-500 text-center py-8">Belum ada pekerjaan yang sesuai filter.</p>
               )}
            </div>
         </div>
