@@ -10,6 +10,7 @@ export default function ImportPage() {
   const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    e.target.value = ''; // Reset input to allow re-selecting the same file
 
     const reader = new FileReader();
     reader.onload = async (event) => {
@@ -25,7 +26,7 @@ export default function ImportPage() {
 
         const result = await importDataToFirestore(dataList);
         setStatus('success');
-        setMessage(`Berhasil! ${result.added} data baru dimasukkan, dan ${result.duplicates} data duplikat (sudah ada di database) dilewati.`);
+        setMessage(`Berhasil! Database telah diperbarui. (${result.added} data baru ditambahkan, ${result.duplicates} data lama diperbarui).`);
       } catch (err: any) {
         setStatus('error');
         setMessage(err.message || "Gagal memproses file.");
