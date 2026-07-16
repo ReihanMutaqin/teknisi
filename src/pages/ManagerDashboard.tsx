@@ -4,6 +4,7 @@ import type { TaskData } from "../lib/db";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid } from 'recharts';
 import { Loader2 } from "lucide-react";
 import { DataTable } from "../components/DataTable";
+import { GoogleAd } from "../components/GoogleAd";
 
 const formatMonth = (yyyyMm: string) => {
   const [year, month] = yyyyMm.split('-');
@@ -143,6 +144,8 @@ export default function ManagerDashboard() {
 
   return (
     <div className="space-y-6">
+      <GoogleAd />
+      
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center bg-white p-4 rounded-xl shadow-sm border border-slate-200 gap-4">
         <h1 className="text-xl font-bold text-slate-800">Dashboard</h1>
         <div className="flex flex-wrap items-center gap-3">
