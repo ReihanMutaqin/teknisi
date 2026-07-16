@@ -18,8 +18,8 @@ export function GoogleAd() {
       <ins
         className="adsbygoogle"
         style={{ display: "block", minWidth: "250px", width: "100%", height: "90px" }}
-        data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
-        data-ad-slot="XXXXXXXXXX"
+        data-ad-client="ca-pub-5291596525422164"
+        data-ad-slot="AUTO"
         data-ad-format="auto"
         data-full-width-responsive="true"
       ></ins>
