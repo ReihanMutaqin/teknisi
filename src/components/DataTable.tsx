@@ -27,9 +27,12 @@ const getFilterValue = (key: ColumnKey, rawVal: string) => {
   const val = String(rawVal);
   if (key === 'lastUpdateStatus') return val.split(' ')[0];
   if (key === 'statusMessage') {
-    if (val.length > 35) {
-      return val.substring(0, 35).trim() + '...';
+    // Aggressive truncation: split by common delimiters to get the core message
+    let clean = val.split(',')[0].split('.')[0].split('-')[0].trim();
+    if (clean.length > 25) {
+      clean = clean.substring(0, 25).trim() + '...';
     }
+    return clean;
   }
   return val;
 };
