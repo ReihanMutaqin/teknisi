@@ -71,7 +71,7 @@ export default function TechnicianView() {
 
   const uniqueStatusResumes = Array.from(new Set(tasks.map(t => t.statusResume))).filter(Boolean).sort();
   const uniqueStos = Array.from(new Set(tasks.map(t => t.sto))).filter(Boolean).sort();
-  const uniqueDates = Array.from(new Set(tasks.map(t => t.orderDate))).filter(Boolean).sort().reverse();
+  const uniqueDates = Array.from(new Set(tasks.map(t => (t.orderDate || '').split(' ')[0]))).filter(Boolean).sort().reverse();
   
   let filteredTasks = tasks;
   if (selectedStatusResume) {
@@ -84,7 +84,7 @@ export default function TechnicianView() {
     filteredTasks = filteredTasks.filter(t => t.trackerStatus === selectedTrackerStatus);
   }
   if (selectedDate) {
-    filteredTasks = filteredTasks.filter(t => t.orderDate === selectedDate);
+    filteredTasks = filteredTasks.filter(t => (t.orderDate || '').split(' ')[0] === selectedDate);
   }
 
   const tasksForCounts = selectedSto ? tasks.filter(t => t.sto === selectedSto) : tasks;
