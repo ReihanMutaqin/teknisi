@@ -195,7 +195,10 @@ export default function ManagerDashboard() {
                 outerRadius={100}
                 paddingAngle={5}
                 dataKey="value"
-                label={({ name, percent }) => percent > 0 ? `${name} ${(percent * 100).toFixed(1)}%` : ''}
+                label={(props: any) => {
+                  const { name, percent } = props;
+                  return (percent && percent > 0) ? `${name} ${(percent * 100).toFixed(1)}%` : '';
+                }}
                 labelLine={true}
               >
                 {pieData.map((entry, index) => (
@@ -215,7 +218,11 @@ export default function ManagerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="witel" tick={{fontSize: 12}} />
                 <YAxis />
-                <Tooltip formatter={(value: number, name: string, props: any) => [`${value} (${((value / props.payload.total) * 100).toFixed(1)}%)`, name]} />
+                <Tooltip formatter={(value: any, name: any, props: any) => {
+                  const numValue = Number(value) || 0;
+                  const total = props?.payload?.total || 1;
+                  return [`${numValue} (${((numValue / total) * 100).toFixed(1)}%)`, String(name)];
+                }} />
                 <Bar dataKey="Completed" stackId="a" fill={COLORS['Completed']} />
                 <Bar dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} />
                 <Bar dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} />
@@ -232,7 +239,11 @@ export default function ManagerDashboard() {
                 <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#e2e8f0" />
                 <XAxis dataKey="sto" tick={{fontSize: 10}} />
                 <YAxis />
-                <Tooltip formatter={(value: number, name: string, props: any) => [`${value} (${((value / props.payload.total) * 100).toFixed(1)}%)`, name]} />
+                <Tooltip formatter={(value: any, name: any, props: any) => {
+                  const numValue = Number(value) || 0;
+                  const total = props?.payload?.total || 1;
+                  return [`${numValue} (${((numValue / total) * 100).toFixed(1)}%)`, String(name)];
+                }} />
                 <Bar dataKey="Completed" stackId="a" fill={COLORS['Completed']} />
                 <Bar dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} />
                 <Bar dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} />
