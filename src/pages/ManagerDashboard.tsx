@@ -6,7 +6,7 @@ import {
   BarChart, Bar, XAxis, YAxis, CartesianGrid, Legend,
   LineChart, Line
 } from 'recharts';
-import { Loader2, Download, Briefcase, Users, AlertTriangle, CheckCircle, Clock, Activity, Calendar as CalendarIcon, MapPin } from "lucide-react";
+import { Loader2, Download, Briefcase, Users, AlertTriangle, CheckCircle, Clock, Activity, Calendar as CalendarIcon, MapPin, X } from "lucide-react";
 import { DataTable } from "../components/DataTable";
 import * as XLSX from 'xlsx';
 import { format, parseISO, isValid } from 'date-fns';
@@ -39,6 +39,10 @@ export default function ManagerDashboard() {
   // Operational Insights filters
   const [activityFilterSto, setActivityFilterSto] = useState<string>("ALL");
   const [activityFilterStatus, setActivityFilterStatus] = useState<string>("ALL");
+
+  // Modal State
+  const [modalData, setModalData] = useState<TaskData[] | null>(null);
+  const [modalTitle, setModalTitle] = useState<string>("");
 
   useEffect(() => {
     async function fetchTasks() {
@@ -217,6 +221,15 @@ export default function ManagerDashboard() {
     }
   };
 
+  const openModal = (title: string, data: TaskData[]) => {
+    setModalTitle(title);
+    setModalData(data);
+  };
+
+  const closeModal = () => {
+    setModalData(null);
+  };
+
   if (loading) {
     return (
       <div className="flex h-[70vh] items-center justify-center">
@@ -280,7 +293,10 @@ export default function ManagerDashboard() {
 
       {/* KPI Cards */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg transition-all group overflow-hidden relative">
+        <div 
+          onClick={() => openModal('Total Pekerjaan', filteredTasks)}
+          className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-blue-300 transition-all group overflow-hidden relative cursor-pointer"
+        >
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-blue-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
           <div className="relative z-10 flex justify-between items-start">
             <div>
@@ -293,7 +309,10 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg transition-all group overflow-hidden relative">
+        <div 
+          onClick={() => openModal('Pekerjaan Selesai', filteredTasks.filter(t => t.trackerStatus === 'Completed'))}
+          className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-emerald-300 transition-all group overflow-hidden relative cursor-pointer"
+        >
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-emerald-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
           <div className="relative z-10 flex justify-between items-start">
             <div>
@@ -311,7 +330,10 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg transition-all group overflow-hidden relative">
+        <div 
+          onClick={() => openModal('Total Kendala', filteredTasks.filter(t => t.trackerStatus === 'Kendala'))}
+          className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-amber-300 transition-all group overflow-hidden relative cursor-pointer"
+        >
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-amber-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
           <div className="relative z-10 flex justify-between items-start">
             <div>
@@ -324,7 +346,13 @@ export default function ManagerDashboard() {
           </div>
         </div>
 
-        <div className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg transition-all group overflow-hidden relative">
+        <div 
+          onClick={() => {
+            const active = filteredTasks.filter(t => t.technicianName && ['On Progress', 'Kendala'].includes(t.trackerStatus));
+            openModal('Aktivitas Teknisi', active);
+          }}
+          className="bg-white p-5 rounded-2xl shadow-sm border border-slate-200 hover:shadow-lg hover:border-indigo-300 transition-all group overflow-hidden relative cursor-pointer"
+        >
           <div className="absolute -right-6 -top-6 w-24 h-24 bg-indigo-50 rounded-full group-hover:scale-150 transition-transform duration-500 ease-out z-0"></div>
           <div className="relative z-10 flex justify-between items-start">
             <div>
@@ -367,8 +395,16 @@ export default function ManagerDashboard() {
                   }}
                 />
                 <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                <Line type="monotone" dataKey="Total" stroke="#94a3b8" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
-                <Line type="monotone" dataKey="Completed" stroke="#10b981" strokeWidth={3} dot={false} activeDot={{ r: 6 }} />
+                <Line type="monotone" dataKey="Total" stroke="#94a3b8" strokeWidth={3} dot={{ cursor: 'pointer', r: 4 }} activeDot={{ r: 6, cursor: 'pointer' }} onClick={(data: any) => {
+                  if (data && data.payload && data.payload.date) {
+                    openModal(`Total Pekerjaan Tanggal ${data.payload.date}`, filteredTasks.filter(t => (t.orderDate || '').startsWith(data.payload.date)));
+                  }
+                }} />
+                <Line type="monotone" dataKey="Completed" stroke="#10b981" strokeWidth={3} dot={{ cursor: 'pointer', r: 4 }} activeDot={{ r: 6, cursor: 'pointer' }} onClick={(data: any) => {
+                  if (data && data.payload && data.payload.date) {
+                    openModal(`Pekerjaan Selesai Tanggal ${data.payload.date}`, filteredTasks.filter(t => (t.orderDate || '').startsWith(data.payload.date) && t.trackerStatus === 'Completed'));
+                  }
+                }} />
               </LineChart>
             </ResponsiveContainer>
           </div>
@@ -393,9 +429,15 @@ export default function ManagerDashboard() {
                     return (percent && percent > 0) ? `${name} ${(percent * 100).toFixed(0)}%` : '';
                   }}
                   labelLine={{ stroke: '#cbd5e1', strokeWidth: 1 }}
+                  onClick={(data: any) => {
+                    if (data && data.name) {
+                      openModal(`Pekerjaan Status: ${data.name}`, filteredTasks.filter(t => t.trackerStatus === data.name));
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
                 >
                   {pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS]} />
+                    <Cell key={`cell-${index}`} fill={COLORS[entry.name as keyof typeof COLORS]} className="hover:opacity-80 transition-opacity" />
                   ))}
                 </Pie>
                 <Tooltip 
@@ -424,9 +466,21 @@ export default function ManagerDashboard() {
                     cursor={{fill: '#f8fafc'}}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Bar dataKey="Completed" stackId="a" fill={COLORS['Completed']} radius={[0, 0, 4, 4]} maxBarSize={60} />
-                  <Bar dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} maxBarSize={60} />
-                  <Bar dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} radius={[4, 4, 0, 0]} maxBarSize={60} />
+                  <Bar 
+                    dataKey="Completed" stackId="a" fill={COLORS['Completed']} radius={[0, 0, 4, 4]} maxBarSize={60} 
+                    style={{ cursor: 'pointer' }}
+                    onClick={(data: any) => openModal(`WITEL ${data.witel} - Selesai`, filteredTasks.filter(t => t.witel === data.witel && t.trackerStatus === 'Completed'))}
+                  />
+                  <Bar 
+                    dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} maxBarSize={60} 
+                    style={{ cursor: 'pointer' }}
+                    onClick={(data: any) => openModal(`WITEL ${data.witel} - On Progress`, filteredTasks.filter(t => t.witel === data.witel && t.trackerStatus === 'On Progress'))}
+                  />
+                  <Bar 
+                    dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} radius={[4, 4, 0, 0]} maxBarSize={60} 
+                    style={{ cursor: 'pointer' }}
+                    onClick={(data: any) => openModal(`WITEL ${data.witel} - Kendala`, filteredTasks.filter(t => t.witel === data.witel && t.trackerStatus === 'Kendala'))}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -449,9 +503,21 @@ export default function ManagerDashboard() {
                     cursor={{fill: '#f8fafc'}}
                   />
                   <Legend iconType="circle" wrapperStyle={{ fontSize: '12px', paddingTop: '10px' }} />
-                  <Bar dataKey="Completed" stackId="a" fill={COLORS['Completed']} radius={[0, 0, 4, 4]} maxBarSize={50} />
-                  <Bar dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} maxBarSize={50} />
-                  <Bar dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} radius={[4, 4, 0, 0]} maxBarSize={50} />
+                  <Bar 
+                    dataKey="Completed" stackId="a" fill={COLORS['Completed']} radius={[0, 0, 4, 4]} maxBarSize={50} 
+                    style={{ cursor: 'pointer' }}
+                    onClick={(data: any) => openModal(`STO ${data.sto} - Selesai`, filteredTasks.filter(t => t.sto === data.sto && t.trackerStatus === 'Completed'))}
+                  />
+                  <Bar 
+                    dataKey="On Progress" stackId="a" fill={COLORS['On Progress']} maxBarSize={50} 
+                    style={{ cursor: 'pointer' }}
+                    onClick={(data: any) => openModal(`STO ${data.sto} - On Progress`, filteredTasks.filter(t => t.sto === data.sto && t.trackerStatus === 'On Progress'))}
+                  />
+                  <Bar 
+                    dataKey="Kendala" stackId="a" fill={COLORS['Kendala']} radius={[4, 4, 0, 0]} maxBarSize={50} 
+                    style={{ cursor: 'pointer' }}
+                    onClick={(data: any) => openModal(`STO ${data.sto} - Kendala`, filteredTasks.filter(t => t.sto === data.sto && t.trackerStatus === 'Kendala'))}
+                  />
                 </BarChart>
               </ResponsiveContainer>
             </div>
@@ -472,9 +538,17 @@ export default function ManagerDashboard() {
                   contentStyle={{ borderRadius: '12px', border: 'none', boxShadow: '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)' }}
                   cursor={{fill: '#f8fafc'}}
                 />
-                <Bar dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={20}>
+                <Bar 
+                  dataKey="value" fill="#6366f1" radius={[0, 4, 4, 0]} barSize={20}
+                  onClick={(data: any) => {
+                    if (data && data.name) {
+                      openModal(`Layanan: ${data.name}`, filteredTasks.filter(t => t.serviceType === data.name || (!t.serviceType && data.name === 'Unknown')));
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                >
                   {serviceTypeData.slice(0, 10).map((_, index) => (
-                    <Cell key={`cell-${index}`} fill={SERVICE_COLORS[index % SERVICE_COLORS.length]} />
+                    <Cell key={`cell-${index}`} fill={SERVICE_COLORS[index % SERVICE_COLORS.length]} className="hover:opacity-80 transition-opacity" />
                   ))}
                 </Bar>
               </BarChart>
@@ -498,7 +572,7 @@ export default function ManagerDashboard() {
               .filter(t => t.trackerStatus === 'Kendala' && t.notes)
               .slice(0, 15)
               .map(t => (
-              <div key={t.id} className="bg-white p-4 rounded-xl border border-amber-100 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden">
+              <div key={t.id} className="bg-white p-4 rounded-xl border border-amber-100 shadow-sm hover:shadow-md transition-shadow group relative overflow-hidden cursor-pointer" onClick={() => openModal(`Detail Kendala: ${t.order}`, [t])}>
                 <div className="absolute left-0 top-0 bottom-0 w-1 bg-amber-400"></div>
                 <div className="flex justify-between items-start mb-2 pl-2">
                   <div>
@@ -566,7 +640,7 @@ export default function ManagerDashboard() {
             {displayedActiveTasks
               .slice(0, 15)
               .map(t => (
-              <div key={t.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all group hover:border-blue-200">
+              <div key={t.id} className="bg-white p-4 rounded-xl border border-slate-100 shadow-sm hover:shadow-md transition-all group hover:border-blue-200 cursor-pointer" onClick={() => openModal(`Detail Pekerjaan: ${t.order}`, [t])}>
                 <div className="flex justify-between items-center mb-2">
                   <span className="font-bold text-slate-800 text-sm">{t.order}</span>
                   <span className={`px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusColor(t.trackerStatus)}`}>
@@ -606,15 +680,44 @@ export default function ManagerDashboard() {
       <div className="bg-white p-1 rounded-2xl shadow-sm border border-slate-200 overflow-hidden mt-8">
         <div className="p-4 border-b border-slate-100 bg-slate-50/50">
            <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-             <Briefcase className="w-5 h-5 text-indigo-500" /> Detail Data Pekerjaan
+             <Briefcase className="w-5 h-5 text-indigo-500" /> Detail Data Keseluruhan
            </h2>
         </div>
         <DataTable data={filteredTasks} />
       </div>
 
+      {/* Pop-up Modal Detail */}
+      {modalData && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 animate-in fade-in duration-200">
+          <div className="absolute inset-0 bg-slate-900/60 backdrop-blur-sm" onClick={closeModal}></div>
+          <div className="relative w-full max-w-6xl bg-white rounded-2xl shadow-2xl flex flex-col h-[85vh] transform scale-100 animate-in zoom-in-95 duration-200">
+            <div className="flex items-center justify-between p-5 border-b border-slate-100 bg-white rounded-t-2xl z-10 shrink-0">
+              <div>
+                <h2 className="text-xl font-bold text-slate-800">{modalTitle}</h2>
+                <p className="text-sm text-slate-500 font-medium mt-1">
+                  Menampilkan {modalData.length} baris data
+                </p>
+              </div>
+              <button 
+                onClick={closeModal} 
+                className="p-2 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-full transition-colors self-start"
+              >
+                <X className="w-6 h-6" />
+              </button>
+            </div>
+            <div className="flex-1 overflow-hidden bg-slate-50 rounded-b-2xl flex flex-col p-2">
+              <div className="overflow-auto custom-scrollbar flex-1 bg-white rounded-xl shadow-sm border border-slate-100">
+                <DataTable data={modalData} />
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       <style>{`
         .custom-scrollbar::-webkit-scrollbar {
-          width: 6px;
+          width: 8px;
+          height: 8px;
         }
         .custom-scrollbar::-webkit-scrollbar-track {
           background: transparent;
