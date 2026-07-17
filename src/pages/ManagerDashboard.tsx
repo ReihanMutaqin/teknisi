@@ -196,12 +196,12 @@ export default function ManagerDashboard() {
       'Address': t.address,
       'Service Type': t.serviceType,
       'Internet': t.internet,
-      'Order Date': t.orderDate,
+      'LAST UPDATE STATUS': t.orderDate,
       'Technician': t.technicianName || '-',
       'Status': t.trackerStatus,
       'Status Message': t.statusMessage || '-',
       'Notes': t.notes || '-',
-      'Last Update': format(new Date(t.updatedAt), "dd MMM yyyy HH:mm", { locale: id })
+      'Last Update App': format(new Date(t.updatedAt), "dd MMM yyyy HH:mm", { locale: id })
     }));
 
     const worksheet = XLSX.utils.json_to_sheet(exportData);
