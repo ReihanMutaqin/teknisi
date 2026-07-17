@@ -63,7 +63,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         added++;
       } else {
         const old = existing[orderId];
-        if (old.statusMessage !== newStatusMessage) {
+        const needsAutoComplete = isCompleted && old.trackerStatus !== 'Completed';
+        if (old.statusMessage !== newStatusMessage || needsAutoComplete) {
           existing[orderId] = {
             ...old,
             witel: item['WITEL_OLD'] || old.witel,
@@ -102,7 +103,9 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
 
     if (existingDocs.has(orderId)) {
       const old = existingDocs.get(orderId)!;
-      if (old.statusMessage !== newStatusMessage) {
+      const needsAutoComplete = isCompleted && old.trackerStatus !== 'Completed';
+      
+      if (old.statusMessage !== newStatusMessage || needsAutoComplete) {
         duplicates++;
         const docRef = doc(db, COLLECTION_NAME, orderId);
         
