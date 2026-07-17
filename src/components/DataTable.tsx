@@ -2,7 +2,7 @@ import { useState, useMemo, useRef, useEffect } from "react";
 import ExcelJS from "exceljs";
 import { saveAs } from "file-saver";
 import type { TaskData } from "../lib/db";
-import { Filter, X, Download } from "lucide-react";
+import { Filter, X, Download, Search } from "lucide-react";
 
 interface DataTableProps {
   data: TaskData[];
@@ -44,6 +44,7 @@ const getFilterValue = (key: ColumnKey, rawVal: string) => {
 export function DataTable({ data }: DataTableProps) {
   const [filters, setFilters] = useState<Record<ColumnKey, Set<string>>>({} as Record<ColumnKey, Set<string>>);
   const [openFilter, setOpenFilter] = useState<ColumnKey | null>(null);
+  const [searchTerm, setSearchTerm] = useState("");
   const [selectedRow, setSelectedRow] = useState<TaskData | null>(null);
   const filterRef = useRef<HTMLDivElement>(null);
 
@@ -63,7 +64,18 @@ export function DataTable({ data }: DataTableProps) {
   const handleExport = async () => {
     let toExport = data;
     
-    // First, apply current table filters so it respects WITEL, Date, etc. if selected
+    // First apply search
+    if (searchTerm.trim()) {
+      const lowerSearch = searchTerm.toLowerCase();
+      toExport = toExport.filter(row => {
+        return COLUMNS.some(col => {
+          const val = String(row[col.key] || '').toLowerCase();
+          return val.includes(lowerSearch);
+        });
+      });
+    }
+
+    // Then, apply current table filters so it respects WITEL, Date, etc. if selected
     toExport = toExport.filter(row => {
       for (const key of Object.keys(filters) as ColumnKey[]) {
         const activeFilters = filters[key];
@@ -173,7 +185,19 @@ export function DataTable({ data }: DataTableProps) {
   };
 
   const filteredData = useMemo(() => {
-    return data.filter(row => {
+    let result = data;
+    
+    if (searchTerm.trim()) {
+      const lowerSearch = searchTerm.toLowerCase();
+      result = result.filter(row => {
+        return COLUMNS.some(col => {
+          const val = String(row[col.key] || '').toLowerCase();
+          return val.includes(lowerSearch);
+        });
+      });
+    }
+
+    result = result.filter(row => {
       for (const key of Object.keys(filters) as ColumnKey[]) {
         const activeFilters = filters[key];
         if (activeFilters && activeFilters.size > 0) {
@@ -185,7 +209,9 @@ export function DataTable({ data }: DataTableProps) {
       }
       return true;
     });
-  }, [data, filters]);
+
+    return result;
+  }, [data, filters, searchTerm]);
 
   const toggleFilter = (col: ColumnKey, val: string) => {
     setFilters(prev => {
@@ -228,9 +254,21 @@ export function DataTable({ data }: DataTableProps) {
             Menampilkan {filteredData.length} dari {data.length} data
           </div>
         </div>
-        <div className="flex items-center gap-3">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 w-full sm:w-auto">
+          <div className="relative flex-1 sm:flex-none">
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <Search className="w-4 h-4 text-slate-400" />
+            </div>
+            <input 
+              type="text" 
+              placeholder="Cari data..." 
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-9 pr-4 py-2.5 border border-slate-300 rounded-lg text-sm focus:ring-blue-500 focus:border-blue-500 w-full outline-none transition-all shadow-sm"
+            />
+          </div>
           <select
-            className="bg-white border border-slate-300 text-slate-700 rounded-lg p-2 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none font-semibold"
+            className="bg-white border border-slate-300 text-slate-700 rounded-lg p-2.5 text-sm focus:ring-blue-500 focus:border-blue-500 outline-none font-semibold shadow-sm"
             value={exportStatus}
             onChange={(e) => setExportStatus(e.target.value)}
           >
