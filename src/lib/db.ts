@@ -37,6 +37,9 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
     const existing = await localforage.getItem<Record<string, TaskData>>(COLLECTION_NAME) || {};
     dataList.forEach(item => {
       const orderId = String(item['ORDER'] || `UNKNOWN-${Math.random()}`);
+      const newStatusMessage = item['STATUS MESSAGE'] || '';
+      const isCompleted = newStatusMessage.toLowerCase().trim() === 'completed';
+      
       if (!existing[orderId]) {
         existing[orderId] = {
           id: orderId,
@@ -48,35 +51,37 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
           serviceType: item['JENIS LAYANAN'] || '',
           unit: item['UNIT'] || '',
           paket: item['JENIS LAYANAN'] || '',
-          technicianName: '',
-          trackerStatus: 'Pending',
+          technicianName: isCompleted ? 'SISTEM' : '',
+          trackerStatus: isCompleted ? 'Completed' : 'Pending',
           notes: '',
           internet: item['INTERNET'] || '',
-          statusMessage: item['STATUS MESSAGE'] || '',
+          statusMessage: newStatusMessage,
           sto: item['STO'] || '',
           orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
           updatedAt: new Date().toISOString()
         };
         added++;
       } else {
-        // Update existing record to catch any newly mapped fields without wiping trackerStatus/technicianName
         const old = existing[orderId];
-        existing[orderId] = {
-          ...old,
-          witel: item['WITEL_OLD'] || old.witel,
-          statusResume: item['STATUS RESUME'] || old.statusResume,
-          customerName: item['NAMA CUST'] || old.customerName,
-          address: item['ALAMAT'] || old.address,
-          serviceType: item['JENIS LAYANAN'] || old.serviceType,
-          unit: item['UNIT'] || old.unit || '',
-          paket: item['JENIS LAYANAN'] || old.paket || '',
-          internet: item['INTERNET'] || old.internet,
-          statusMessage: item['STATUS MESSAGE'] || old.statusMessage,
-          sto: item['STO'] || old.sto,
-          orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || old.orderDate,
-          updatedAt: new Date().toISOString()
-        };
-        duplicates++;
+        if (old.statusMessage !== newStatusMessage) {
+          existing[orderId] = {
+            ...old,
+            witel: item['WITEL_OLD'] || old.witel,
+            statusResume: item['STATUS RESUME'] || old.statusResume,
+            customerName: item['NAMA CUST'] || old.customerName,
+            address: item['ALAMAT'] || old.address,
+            serviceType: item['JENIS LAYANAN'] || old.serviceType,
+            unit: item['UNIT'] || old.unit || '',
+            paket: item['JENIS LAYANAN'] || old.paket || '',
+            internet: item['INTERNET'] || old.internet,
+            statusMessage: newStatusMessage,
+            sto: item['STO'] || old.sto,
+            orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || old.orderDate,
+            updatedAt: new Date().toISOString(),
+            ...(isCompleted ? { trackerStatus: 'Completed', technicianName: 'SISTEM' } : {})
+          };
+          duplicates++;
+        }
       }
     });
     await localforage.setItem(COLLECTION_NAME, existing);
@@ -84,34 +89,49 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
   }
   
   const querySnapshot = await getDocs(collection(db, COLLECTION_NAME));
-  const existingIds = new Set<string>();
-  querySnapshot.forEach(d => existingIds.add(d.id));
+  const existingDocs = new Map<string, TaskData>();
+  querySnapshot.forEach(d => existingDocs.set(d.id, d.data() as TaskData));
 
   const batch = writeBatch(db);
+  let batchCount = 0;
   
   dataList.forEach(item => {
     const orderId = String(item['ORDER'] || `UNKNOWN-${Math.random()}`);
-    if (existingIds.has(orderId)) {
-      duplicates++;
-      const docRef = doc(db, COLLECTION_NAME, orderId);
-      // Only merge safe fields to not wipe out technician status/notes
-      batch.set(docRef, {
-        witel: item['WITEL_OLD'] || 'UNKNOWN',
-        statusResume: item['STATUS RESUME'] || '',
-        customerName: item['NAMA CUST'] || '',
-        address: item['ALAMAT'] || '',
-        serviceType: item['JENIS LAYANAN'] || '',
-        unit: item['UNIT'] || '',
-        paket: item['JENIS LAYANAN'] || '',
-        internet: item['INTERNET'] || '',
-        statusMessage: item['STATUS MESSAGE'] || '',
-        sto: item['STO'] || '',
-        orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
-        updatedAt: new Date().toISOString()
-      }, { merge: true });
+    const newStatusMessage = item['STATUS MESSAGE'] || '';
+    const isCompleted = newStatusMessage.toLowerCase().trim() === 'completed';
+
+    if (existingDocs.has(orderId)) {
+      const old = existingDocs.get(orderId)!;
+      if (old.statusMessage !== newStatusMessage) {
+        duplicates++;
+        const docRef = doc(db, COLLECTION_NAME, orderId);
+        
+        const updateData: any = {
+          witel: item['WITEL_OLD'] || old.witel || 'UNKNOWN',
+          statusResume: item['STATUS RESUME'] || old.statusResume || '',
+          customerName: item['NAMA CUST'] || old.customerName || '',
+          address: item['ALAMAT'] || old.address || '',
+          serviceType: item['JENIS LAYANAN'] || old.serviceType || '',
+          unit: item['UNIT'] || old.unit || '',
+          paket: item['JENIS LAYANAN'] || old.paket || '',
+          internet: item['INTERNET'] || old.internet || '',
+          statusMessage: newStatusMessage,
+          sto: item['STO'] || old.sto || '',
+          orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || old.orderDate || '',
+          updatedAt: new Date().toISOString()
+        };
+
+        if (isCompleted) {
+          updateData.trackerStatus = 'Completed';
+          updateData.technicianName = 'SISTEM';
+        }
+
+        batch.set(docRef, updateData, { merge: true });
+        batchCount++;
+      }
     } else {
       added++;
-      existingIds.add(orderId); // avoid counting duplicates within the same json
+      existingDocs.set(orderId, {} as TaskData); // avoid counting duplicates within same json
       
       const docRef = doc(db, COLLECTION_NAME, orderId);
       const task: TaskData = {
@@ -124,21 +144,22 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
         serviceType: item['JENIS LAYANAN'] || '',
         unit: item['UNIT'] || '',
         paket: item['JENIS LAYANAN'] || '',
-        technicianName: '', 
-        trackerStatus: 'Pending',
+        technicianName: isCompleted ? 'SISTEM' : '', 
+        trackerStatus: isCompleted ? 'Completed' : 'Pending',
         notes: '',
         internet: item['INTERNET'] || '',
-        statusMessage: item['STATUS MESSAGE'] || '',
+        statusMessage: newStatusMessage,
         sto: item['STO'] || '',
         orderDate: item['LAST UPDATE STATUS'] || item['ORDER DATE'] || item['TGL ORDER'] || '',
         updatedAt: new Date().toISOString()
       };
       
       batch.set(docRef, task);
+      batchCount++;
     }
   });
 
-  if (added > 0) {
+  if (batchCount > 0) {
     await batch.commit();
   }
   
