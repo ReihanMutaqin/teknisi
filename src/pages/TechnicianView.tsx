@@ -103,7 +103,17 @@ export default function TechnicianView() {
     });
   }
 
-  const tasksForCounts = selectedSto ? tasks.filter(t => t.sto === selectedSto) : tasks;
+  const tasksForCounts = tasks.filter(t => {
+    if (selectedStatusResume && t.statusResume !== selectedStatusResume) return false;
+    if (selectedSto && t.sto !== selectedSto) return false;
+    if (selectedDate) {
+      const parts = (t.orderDate || '').split(' ')[0].split('-');
+      const m = parts.length >= 2 ? `${parts[0]}-${parts[1]}` : '';
+      if (m !== selectedDate) return false;
+    }
+    return true;
+  });
+
   const statusCounts = {
     'Pending': 0, 'On Progress': 0, 'Completed': 0, 'Kendala': 0, 'Cancel': 0
   };
