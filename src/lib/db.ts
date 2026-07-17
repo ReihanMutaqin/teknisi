@@ -38,7 +38,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
     dataList.forEach(item => {
       const orderId = String(item['ORDER'] || `UNKNOWN-${Math.random()}`);
       const newStatusMessage = item['STATUS MESSAGE'] || '';
-      const isCompleted = newStatusMessage.toLowerCase().trim() === 'completed';
+      const isCompleted = newStatusMessage.toLowerCase().includes('completed') || 
+                          (item['STATUS RESUME'] || '').toLowerCase().includes('completed');
       
       if (!existing[orderId]) {
         existing[orderId] = {
@@ -99,7 +100,8 @@ export async function importDataToFirestore(dataList: any[]): Promise<{ added: n
   dataList.forEach(item => {
     const orderId = String(item['ORDER'] || `UNKNOWN-${Math.random()}`);
     const newStatusMessage = item['STATUS MESSAGE'] || '';
-    const isCompleted = newStatusMessage.toLowerCase().trim() === 'completed';
+    const isCompleted = newStatusMessage.toLowerCase().includes('completed') || 
+                        (item['STATUS RESUME'] || '').toLowerCase().includes('completed');
 
     if (existingDocs.has(orderId)) {
       const old = existingDocs.get(orderId)!;
