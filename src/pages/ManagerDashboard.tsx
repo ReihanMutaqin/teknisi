@@ -199,6 +199,7 @@ export default function ManagerDashboard() {
       'Order Date': t.orderDate,
       'Technician': t.technicianName || '-',
       'Status': t.trackerStatus,
+      'Status Message': t.statusMessage || '-',
       'Notes': t.notes || '-',
       'Last Update': format(new Date(t.updatedAt), "dd MMM yyyy HH:mm", { locale: id })
     }));
