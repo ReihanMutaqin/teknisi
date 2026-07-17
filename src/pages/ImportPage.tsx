@@ -23,7 +23,7 @@ export default function ImportPage() {
           await new Promise<void>((resolve, reject) => {
             (window as any).grecaptcha.enterprise.ready(async () => {
               try {
-                const token = await (window as any).grecaptcha.enterprise.execute('6LdEbFYtAAAAAIFtE1kERXJu-U3tYAZEv2l2Qmwf', {action: 'upload_json'});
+                const token = await (window as any).grecaptcha.enterprise.execute(import.meta.env.VITE_RECAPTCHA_SITE_KEY, {action: 'upload_json'});
                 console.log("ReCAPTCHA Token:", token);
                 // Here you would normally send the token to your backend (which uses the Secret Key) to get the assessment score.
                 resolve();
